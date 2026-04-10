@@ -1,11 +1,11 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
 
-// ════════════════════════════════════════════════════════════
-// NEXUS AI PLATFORM — Complete Customer Experience
-// ════════════════════════════════════════════════════════════
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// NEXUS AI PLATFORM â Complete Customer Experience
+// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
-// ━━━ PART 1: LANDING PAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// âââ PART 1: LANDING PAGE âââââââââââââââââââââââââââââââââ
 
 
 const H = {
@@ -45,10 +45,10 @@ const HomePage = ({ onEnterApp }) => {
   }, []);
 
   const features = [
-    { icon: "🤖", title: "Autonomous Agents", desc: "Deploy AI agents that think, plan, and execute complex tasks independently. Each agent has its own role, tools, and memory.", color: H.accent },
-    { icon: "🔄", title: "Flow Orchestration", desc: "Build multi-agent workflows with visual DAG editor. Chain agents with conditional routing, HITL checkpoints, and persistence.", color: H.cyan },
-    { icon: "🧠", title: "Cognitive Memory", desc: "Agents learn and remember across sessions. Semantic search, importance scoring, and scoped knowledge graphs built-in.", color: H.pink },
-    { icon: "⚡", title: "Real-time Monitoring", desc: "Watch your agents work in real-time. Full execution traces, token usage, latency metrics, and alerting out of the box.", color: H.green },
+    { icon: "ð¤", title: "Autonomous Agents", desc: "Deploy AI agents that think, plan, and execute complex tasks independently. Each agent has its own role, tools, and memory.", color: H.accent },
+    { icon: "ð", title: "Flow Orchestration", desc: "Build multi-agent workflows with visual DAG editor. Chain agents with conditional routing, HITL checkpoints, and persistence.", color: H.cyan },
+    { icon: "ð§ ", title: "Cognitive Memory", desc: "Agents learn and remember across sessions. Semantic search, importance scoring, and scoped knowledge graphs built-in.", color: H.pink },
+    { icon: "â¡", title: "Real-time Monitoring", desc: "Watch your agents work in real-time. Full execution traces, token usage, latency metrics, and alerting out of the box.", color: H.green },
   ];
 
   const pricing = [
@@ -72,7 +72,7 @@ const HomePage = ({ onEnterApp }) => {
 
   return (
     <div style={{ background: H.bg, color: H.text, fontFamily: H.font, minHeight: "100vh", overflow: "hidden" }}>
-      {/* ── Navbar ── */}
+      {/* ââ Navbar ââ */}
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         padding: "16px 40px", display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -104,11 +104,11 @@ const HomePage = ({ onEnterApp }) => {
           }}
           onMouseEnter={e => { e.currentTarget.style.background = H.accentLight; e.currentTarget.style.boxShadow = `0 0 24px ${H.accentGlow}`; }}
           onMouseLeave={e => { e.currentTarget.style.background = H.accent; e.currentTarget.style.boxShadow = "none"; }}
-          >Dashboard →</button>
+          >Dashboard â</button>
         </div>
       </nav>
 
-      {/* ── Hero ── */}
+      {/* ââ Hero ââ */}
       <section style={{ position: "relative", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "120px 40px 80px", overflow: "hidden" }}>
         {/* Animated gradient orb */}
         <div style={{
@@ -138,7 +138,7 @@ const HomePage = ({ onEnterApp }) => {
             animation: "fadeUp 0.6s ease both",
           }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: H.green, animation: "pulse 2s infinite" }} />
-            Now in public beta — 12,000+ teams building with Nexus
+            Now in public beta â 12,000+ teams building with Nexus
           </div>
 
           <h1 style={{
@@ -169,7 +169,7 @@ const HomePage = ({ onEnterApp }) => {
             }}
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 32px ${H.accentGlow}`; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = `0 4px 24px ${H.accentGlow}`; }}
-            >Start Building Free →</button>
+            >Start Building Free â</button>
             <button style={{
               padding: "14px 32px", borderRadius: 12, border: `1px solid ${H.border}`,
               background: H.surface, color: H.text, fontSize: 16, fontWeight: 600,
@@ -205,7 +205,7 @@ const HomePage = ({ onEnterApp }) => {
         </div>
       </section>
 
-      {/* ── Stats Bar ── */}
+      {/* ââ Stats Bar ââ */}
       <section style={{ borderTop: `1px solid ${H.border}`, borderBottom: `1px solid ${H.border}`, padding: "40px 0" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0 }}>
           {stats.map((s, i) => (
@@ -220,7 +220,7 @@ const HomePage = ({ onEnterApp }) => {
         </div>
       </section>
 
-      {/* ── Features ── */}
+      {/* ââ Features ââ */}
       <section id="features" style={{ padding: "100px 40px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 60 }}>
           <h2 style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 16 }}>
@@ -251,7 +251,7 @@ const HomePage = ({ onEnterApp }) => {
         </div>
       </section>
 
-      {/* ── Pricing ── */}
+      {/* ââ Pricing ââ */}
       <section id="pricing" style={{ padding: "100px 40px", background: "rgba(255,255,255,0.01)" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 60 }}>
@@ -296,7 +296,7 @@ const HomePage = ({ onEnterApp }) => {
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {plan.features.map((f, fi) => (
                     <div key={fi} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: H.textMuted }}>
-                      <span style={{ color: H.green, fontSize: 16 }}>✓</span>
+                      <span style={{ color: H.green, fontSize: 16 }}>â</span>
                       {f}
                     </div>
                   ))}
@@ -307,7 +307,7 @@ const HomePage = ({ onEnterApp }) => {
         </div>
       </section>
 
-      {/* ── Testimonials ── */}
+      {/* ââ Testimonials ââ */}
       <section style={{ padding: "100px 40px", maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 60 }}>
           <h2 style={{ fontSize: 44, fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 16 }}>
@@ -341,7 +341,7 @@ const HomePage = ({ onEnterApp }) => {
         </div>
       </section>
 
-      {/* ── CTA ── */}
+      {/* ââ CTA ââ */}
       <section style={{
         padding: "80px 40px", margin: "0 40px 60px", borderRadius: 24,
         background: `linear-gradient(135deg, ${H.accent}15, ${H.pink}10)`,
@@ -372,7 +372,7 @@ const HomePage = ({ onEnterApp }) => {
         </div>
       </section>
 
-      {/* ── Footer ── */}
+      {/* ââ Footer ââ */}
       <footer style={{ borderTop: `1px solid ${H.border}`, padding: "60px 40px 40px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr 1fr", gap: 40, marginBottom: 40 }}>
           <div>
@@ -402,7 +402,7 @@ const HomePage = ({ onEnterApp }) => {
           ))}
         </div>
         <div style={{ maxWidth: 1100, margin: "0 auto", borderTop: `1px solid ${H.border}`, paddingTop: 24, display: "flex", justifyContent: "space-between", fontSize: 13, color: H.textDim }}>
-          <span>© 2026 Nexus AI, Inc. All rights reserved.</span>
+          <span>Â© 2026 Nexus AI, Inc. All rights reserved.</span>
           <div style={{ display: "flex", gap: 24 }}>
             {["Twitter", "GitHub", "Discord", "LinkedIn"].map(s => (
               <span key={s} style={{ cursor: "pointer", transition: "color 0.2s" }}
@@ -426,10 +426,10 @@ const HomePage = ({ onEnterApp }) => {
 
 
 
-// ━━━ PART 2: CUSTOMER PORTAL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// âââ PART 2: CUSTOMER PORTAL ââââââââââââââââââââââââââââââ
 
 
-// ─── DESIGN TOKENS (Light Customer Theme) ────────────────────
+// âââ DESIGN TOKENS (Light Customer Theme) ââââââââââââââââââââ
 const T = {
   bg: "#f8f7f4",
   surface: "#ffffff",
@@ -466,7 +466,7 @@ const T = {
 const statusColor = (s) => ({ active: T.green, running: T.green, completed: T.green, healthy: T.green, idle: T.textDim, paused: T.amber, waiting: T.amber, error: T.red, stopped: T.textDim }[s] || T.textDim);
 const statusBg = (s) => ({ active: T.greenSoft, running: T.greenSoft, completed: T.greenSoft, healthy: T.greenSoft, idle: T.elevated, paused: T.amberSoft, waiting: T.amberSoft, error: T.redSoft, stopped: T.elevated }[s] || T.elevated);
 
-// ─── GLOBAL STYLES ───────────────────────────────────────────
+// âââ GLOBAL STYLES âââââââââââââââââââââââââââââââââââââââââââ
 const GlobalStyles = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
@@ -486,7 +486,7 @@ const GlobalStyles = () => (
   `}</style>
 );
 
-// ─── ICONS ───────────────────────────────────────────────────
+// âââ ICONS âââââââââââââââââââââââââââââââââââââââââââââââââââ
 const Icon = ({ name, size = 18, color = "currentColor" }) => {
   const icons = {
     home: <><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></>,
@@ -521,7 +521,54 @@ const Icon = ({ name, size = 18, color = "currentColor" }) => {
   );
 };
 
-// ─── MOCK DATA ───────────────────────────────────────────────
+// âââ MOCK DATA âââââââââââââââââââââââââââââââââââââââââââââââ
+
+// ─── AUTH PAGE ───────────────────────────────────────────────
+const AuthPage = ({ mode, onSwitch, onSuccess }) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const isSignUp = mode === "signup";
+  const handleSubmit = async () => {
+    setLoading(true); setError(null);
+    try {
+      const url = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
+      const body = isSignUp ? { name, email, password } : { email, password };
+      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await r.json();
+      if (!r.ok) { setError(data.error); setLoading(false); return; }
+      window.localStorage?.setItem('nexus_token', data.token);
+      onSuccess(data.user);
+    } catch(e) { setError('Connection failed'); setLoading(false); }
+  };
+  return (
+    <div style={{ minHeight: "100vh", background: "#09090b", color: "#fafafa", fontFamily: "'Instrument Sans', system-ui, sans-serif", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%)", filter: "blur(80px)", top: "5%", left: "30%" }} />
+      <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 60%)", filter: "blur(60px)", bottom: "15%", right: "20%" }} />
+      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 420, padding: "40px 24px" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg, #6366f1, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 20, color: "#fff" }}>N</div>
+            <span style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.02em" }}>Nexus</span>
+          </div>
+          <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>{isSignUp ? "Create your account" : "Welcome back"}</h1>
+          <p style={{ fontSize: 15, color: "#a1a1aa" }}>{isSignUp ? "Start building AI agents in minutes" : "Sign in to your Nexus dashboard"}</p>
+        </div>
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 28 }}>
+          {error && <div style={{ padding: "10px 14px", borderRadius: 10, background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)", color: "#f87171", fontSize: 13, fontWeight: 500, marginBottom: 16 }}>{error}</div>}
+          {isSignUp && <div style={{ marginBottom: 16 }}><label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#a1a1aa", marginBottom: 6 }}>Full Name</label><input value={name} onChange={e => setName(e.target.value)} placeholder="Your Name" style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.2)", color: "#fafafa", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} /></div>}
+          <div style={{ marginBottom: 16 }}><label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#a1a1aa", marginBottom: 6 }}>Email</label><input value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" type="email" style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.2)", color: "#fafafa", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} /></div>
+          <div style={{ marginBottom: 24 }}><label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#a1a1aa", marginBottom: 6 }}>Password</label><input value={password} onChange={e => setPassword(e.target.value)} placeholder={isSignUp ? "Min 6 characters" : "Your password"} type="password" onKeyDown={e => { if (e.key === 'Enter') handleSubmit(); }} style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.2)", color: "#fafafa", fontSize: 14, fontFamily: "inherit", outline: "none", boxSizing: "border-box" }} /></div>
+          <button onClick={handleSubmit} disabled={loading} style={{ width: "100%", padding: "12px 0", borderRadius: 10, border: "none", cursor: loading ? "wait" : "pointer", background: "linear-gradient(135deg, #6366f1, #818cf8)", color: "#fff", fontSize: 15, fontWeight: 700, fontFamily: "inherit", opacity: loading ? 0.7 : 1 }}>{loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}</button>
+        </div>
+        <p style={{ textAlign: "center", marginTop: 20, fontSize: 14, color: "#a1a1aa" }}>{isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}<span onClick={onSwitch} style={{ color: "#818cf8", fontWeight: 600, cursor: "pointer" }}>{isSignUp ? "Sign in" : "Sign up"}</span></p>
+      </div>
+    </div>
+  );
+};
+
 const USER = { name: "Gopal Yadav", email: "gopal@nexusai.dev", plan: "Pro", avatar: "GY" };
 
 const MY_AGENTS = [
@@ -534,7 +581,7 @@ const MY_AGENTS = [
 ];
 
 const MY_FLOWS = [
-  { id: "f1", name: "Research → Summarize → Publish", status: "running", agents: 3, runs: 47, lastRun: "Running now", successRate: 96, steps: ["Research", "Validate", "Summarize", "Format", "Publish"], currentStep: 3 },
+  { id: "f1", name: "Research â Summarize â Publish", status: "running", agents: 3, runs: 47, lastRun: "Running now", successRate: 96, steps: ["Research", "Validate", "Summarize", "Format", "Publish"], currentStep: 3 },
   { id: "f2", name: "PR Review Pipeline", status: "active", agents: 2, runs: 89, lastRun: "5 min ago", successRate: 99, steps: ["Fetch PR", "Analyze", "Review", "Comment"], currentStep: 4 },
   { id: "f3", name: "Daily Report Generator", status: "completed", agents: 4, runs: 30, lastRun: "Today 6:00 AM", successRate: 100, steps: ["Collect", "Analyze", "Generate", "Email"], currentStep: 4 },
   { id: "f4", name: "Lead Qualification", status: "waiting", agents: 2, runs: 12, lastRun: "1h ago", successRate: 83, steps: ["Ingest", "Score", "Route", "Notify"], currentStep: 2 },
@@ -549,7 +596,7 @@ const API_KEYS = [
   { id: "k3", name: "Development", prefix: "nx-dev-...c9e4", created: "Mar 20, 2026", lastUsed: "3d ago", status: "active" },
 ];
 
-// ─── REUSABLE COMPONENTS ─────────────────────────────────────
+// âââ REUSABLE COMPONENTS âââââââââââââââââââââââââââââââââââââ
 const StatusPill = ({ status }) => (
   <span style={{
     display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 12px",
@@ -604,7 +651,7 @@ const MetricCard = ({ label, value, sub, icon, color = T.accent, trend }) => (
       <div style={{ width: 40, height: 40, borderRadius: 12, background: `${color}10`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Icon name={icon} size={20} color={color} />
       </div>
-      {trend && <span style={{ fontSize: 12, fontWeight: 600, color: trend > 0 ? T.green : T.red }}>{trend > 0 ? "↑" : "↓"} {Math.abs(trend)}%</span>}
+      {trend && <span style={{ fontSize: 12, fontWeight: 600, color: trend > 0 ? T.green : T.red }}>{trend > 0 ? "â" : "â"} {Math.abs(trend)}%</span>}
     </div>
     <div style={{ fontSize: 30, fontWeight: 700, fontFamily: T.font, letterSpacing: "-0.02em", marginBottom: 4 }}>{value}</div>
     <div style={{ fontSize: 13, color: T.textMuted }}>{label}</div>
@@ -612,7 +659,7 @@ const MetricCard = ({ label, value, sub, icon, color = T.accent, trend }) => (
   </Card>
 );
 
-// ─── SIDEBAR ─────────────────────────────────────────────────
+// âââ SIDEBAR âââââââââââââââââââââââââââââââââââââââââââââââââ
 const NAV = [
   { id: "dashboard", icon: "home", label: "Overview" },
   { id: "agents", icon: "cpu", label: "My Agents" },
@@ -686,7 +733,7 @@ const Sidebar = ({ active, onNav }) => (
   </aside>
 );
 
-// ─── TOP BAR ─────────────────────────────────────────────────
+// âââ TOP BAR âââââââââââââââââââââââââââââââââââââââââââââââââ
 const TopBar = ({ title, subtitle }) => (
   <div style={{
     display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -704,7 +751,7 @@ const TopBar = ({ title, subtitle }) => (
       }}>
         <Icon name="search" size={15} color={T.textDim} />
         <span style={{ fontSize: 13, color: T.textDim }}>Search...</span>
-        <span style={{ fontSize: 10, fontFamily: T.mono, color: T.textDim, background: T.surface, padding: "2px 6px", borderRadius: 4, border: `1px solid ${T.border}` }}>⌘K</span>
+        <span style={{ fontSize: 10, fontFamily: T.mono, color: T.textDim, background: T.surface, padding: "2px 6px", borderRadius: 4, border: `1px solid ${T.border}` }}>âK</span>
       </div>
       <div style={{ width: 36, height: 36, borderRadius: 10, background: T.elevated, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", position: "relative" }}>
         <Icon name="bell" size={16} color={T.textMuted} />
@@ -714,7 +761,7 @@ const TopBar = ({ title, subtitle }) => (
   </div>
 );
 
-// ─── DASHBOARD PAGE ──────────────────────────────────────────
+// âââ DASHBOARD PAGE ââââââââââââââââââââââââââââââââââââââââââ
 const DashboardPage = () => {
   const [time, setTime] = useState(new Date());
   useEffect(() => { const t = setInterval(() => setTime(new Date()), 1000); return () => clearInterval(t); }, []);
@@ -724,7 +771,7 @@ const DashboardPage = () => {
 
   return (
     <div>
-      <TopBar title={`${greeting}, ${USER.name.split(" ")[0]}`} subtitle={`${activeAgents} agents active · ${runningFlows} flows running`} />
+      <TopBar title={`${greeting}, ${USER.name.split(" ")[0]}`} subtitle={`${activeAgents} agents active Â· ${runningFlows} flows running`} />
       <div style={{ padding: 32 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 28 }}>
           {[
@@ -743,7 +790,7 @@ const DashboardPage = () => {
           <Card hover={false} style={{ animation: "fadeUp 0.5s ease 0.3s both" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <h3 style={{ fontSize: 15, fontWeight: 600 }}>Recent Agent Runs</h3>
-              <span style={{ fontSize: 12, color: T.accent, fontWeight: 600, cursor: "pointer" }}>View all →</span>
+              <span style={{ fontSize: 12, color: T.accent, fontWeight: 600, cursor: "pointer" }}>View all â</span>
             </div>
             {MY_AGENTS.slice(0, 4).map((a, i) => (
               <div key={a.id} style={{
@@ -764,7 +811,7 @@ const DashboardPage = () => {
           <Card hover={false} style={{ animation: "fadeUp 0.5s ease 0.35s both" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <h3 style={{ fontSize: 15, fontWeight: 600 }}>Active Flows</h3>
-              <span style={{ fontSize: 12, color: T.accent, fontWeight: 600, cursor: "pointer" }}>View all →</span>
+              <span style={{ fontSize: 12, color: T.accent, fontWeight: 600, cursor: "pointer" }}>View all â</span>
             </div>
             {MY_FLOWS.slice(0, 4).map((f, i) => (
               <div key={f.id} style={{
@@ -784,7 +831,7 @@ const DashboardPage = () => {
                     }} />
                   ))}
                 </div>
-                <div style={{ fontSize: 11, color: T.textDim, marginTop: 6 }}>{f.agents} agents · {f.runs} runs · {f.successRate}% success</div>
+                <div style={{ fontSize: 11, color: T.textDim, marginTop: 6 }}>{f.agents} agents Â· {f.runs} runs Â· {f.successRate}% success</div>
               </div>
             ))}
           </Card>
@@ -806,7 +853,7 @@ const DashboardPage = () => {
   );
 };
 
-// ─── AGENTS PAGE ─────────────────────────────────────────────
+// âââ AGENTS PAGE âââââââââââââââââââââââââââââââââââââââââââââ
 const AgentsPage = () => {
   const [selected, setSelected] = useState(null);
   const agent = selected ? MY_AGENTS.find(a => a.id === selected) : null;
@@ -895,7 +942,7 @@ const AgentsPage = () => {
   );
 };
 
-// ─── FLOWS PAGE ──────────────────────────────────────────────
+// âââ FLOWS PAGE ââââââââââââââââââââââââââââââââââââââââââââââ
 const FlowsPage = () => (
   <div>
     <TopBar title="My Flows" subtitle="Automated multi-agent workflows" />
@@ -913,7 +960,7 @@ const FlowsPage = () => (
                 </div>
                 <div>
                   <div style={{ fontSize: 16, fontWeight: 600 }}>{f.name}</div>
-                  <div style={{ fontSize: 12.5, color: T.textDim }}>{f.agents} agents · {f.runs} total runs · Last: {f.lastRun}</div>
+                  <div style={{ fontSize: 12.5, color: T.textDim }}>{f.agents} agents Â· {f.runs} total runs Â· Last: {f.lastRun}</div>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -931,7 +978,7 @@ const FlowsPage = () => (
                     color: si < f.currentStep ? T.green : si === f.currentStep && f.status === "running" ? T.accent : T.textDim,
                     border: `1px solid ${si < f.currentStep ? T.green + "20" : si === f.currentStep && f.status === "running" ? T.accent + "20" : T.border}`,
                   }}>{step}</div>
-                  {si < f.steps.length - 1 && <span style={{ color: T.textDim, fontSize: 10 }}>→</span>}
+                  {si < f.steps.length - 1 && <span style={{ color: T.textDim, fontSize: 10 }}>â</span>}
                 </div>
               ))}
             </div>
@@ -945,7 +992,7 @@ const FlowsPage = () => (
   </div>
 );
 
-// ─── MEMORY PAGE ─────────────────────────────────────────────
+// âââ MEMORY PAGE âââââââââââââââââââââââââââââââââââââââââââââ
 const MemoryPage = () => {
   const [query, setQuery] = useState("");
   const memories = [
@@ -986,7 +1033,7 @@ const MemoryPage = () => {
   );
 };
 
-// ─── USAGE PAGE ──────────────────────────────────────────────
+// âââ USAGE PAGE ââââââââââââââââââââââââââââââââââââââââââââââ
 const UsagePage = () => {
   const dailyUsage = [18, 32, 28, 45, 52, 38, 41, 55, 62, 48, 39, 58, 67, 54, 42, 71, 63, 49, 56, 74, 68, 51, 45, 78, 72, 59, 63, 82, 76, 61];
   const maxUsage = Math.max(...dailyUsage);
@@ -1032,7 +1079,7 @@ const UsagePage = () => {
             <div>
               <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 4 }}>Current Plan</div>
               <div style={{ fontSize: 24, fontWeight: 700 }}>Pro</div>
-              <div style={{ fontSize: 13, color: T.textMuted, marginTop: 4 }}>$49/month · Renews Apr 30</div>
+              <div style={{ fontSize: 13, color: T.textMuted, marginTop: 4 }}>$49/month Â· Renews Apr 30</div>
             </div>
             <div>
               <div style={{ fontSize: 13, color: T.textMuted, marginBottom: 8 }}>Token Budget</div>
@@ -1050,7 +1097,7 @@ const UsagePage = () => {
   );
 };
 
-// ─── API KEYS PAGE ───────────────────────────────────────────
+// âââ API KEYS PAGE âââââââââââââââââââââââââââââââââââââââââââ
 const KeysPage = () => {
   const [copied, setCopied] = useState(null);
   const handleCopy = (id) => { setCopied(id); setTimeout(() => setCopied(null), 2000); };
@@ -1116,8 +1163,8 @@ const KeysPage = () => {
   );
 };
 
-// ─── SETTINGS PAGE ───────────────────────────────────────────
-const SettingsPage = () => {
+// âââ SETTINGS PAGE âââââââââââââââââââââââââââââââââââââââââââ
+const SettingsPage = ({ onSignOut }) => {
   const [tab, setTab] = useState("profile");
   return (
     <div>
@@ -1167,7 +1214,7 @@ const SettingsPage = () => {
             ))}
             <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
               <Btn size="sm">Save Changes</Btn>
-              <Btn variant="ghost" size="sm" icon="logout">Sign Out</Btn>
+              <Btn variant="ghost" size="sm" icon="logout" onClick={onSignOut}>Sign Out</Btn>
             </div>
           </Card>
         )}
@@ -1258,7 +1305,7 @@ const SettingsPage = () => {
   );
 };
 
-// ─── APP ROOT ────────────────────────────────────────────────
+// âââ APP ROOT ââââââââââââââââââââââââââââââââââââââââââââââââ
 const PAGES = {
   dashboard: DashboardPage,
   agents: AgentsPage,
@@ -1269,9 +1316,10 @@ const PAGES = {
   settings: SettingsPage,
 };
 
-const NexusCustomerPortal = ({ onGoHome }) => {
+const NexusCustomerPortal = ({ onGoHome, onSignOut }) => {
   const [page, setPage] = useState("dashboard");
-  const Page = PAGES[page] || DashboardPage;
+  const PageComp = PAGES[page] || DashboardPage;
+  const pageProps = page === "settings" ? { onSignOut } : {};
 
   return (
     <>
@@ -1279,7 +1327,7 @@ const NexusCustomerPortal = ({ onGoHome }) => {
       <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
         <Sidebar active={page} onNav={setPage} />
         <main style={{ flex: 1, overflow: "auto", background: T.bg }}>
-          <Page />
+          <PageComp {...pageProps} />
         </main>
       </div>
     </>
@@ -1287,9 +1335,36 @@ const NexusCustomerPortal = ({ onGoHome }) => {
 }
 
 
-// ━━━ APP ROOT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// âââ APP ROOT âââââââââââââââââââââââââââââââââââââââââââââ
 export default function App() {
   const [view, setView] = useState("home");
-  if (view === "app") return <NexusCustomerPortal onGoHome={() => setView("home")} />;
-  return <HomePage onEnterApp={() => setView("app")} />;
+  const [authMode, setAuthMode] = useState("signin");
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? window.localStorage?.getItem('nexus_token') : null;
+    if (token) {
+      fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + token } })
+        .then(r => r.json())
+        .then(data => { if (data.user) { setUser(data.user); setView("app"); } setAuthLoading(false); })
+        .catch(() => { window.localStorage?.removeItem('nexus_token'); setAuthLoading(false); });
+    } else { setAuthLoading(false); }
+  }, []);
+
+  const handleSignOut = () => { window.localStorage?.removeItem('nexus_token'); setUser(null); setView("home"); };
+  const handleAuthSuccess = (u) => { setUser(u); setView("app"); };
+
+  if (authLoading) return (
+    <div style={{ minHeight: "100vh", background: "#09090b", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ textAlign: "center", color: "#fafafa", fontFamily: "'Instrument Sans', system-ui, sans-serif" }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "linear-gradient(135deg, #6366f1, #ec4899)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 20, color: "#fff", margin: "0 auto 16px", animation: "pulse 2s infinite" }}>N</div>
+        <div style={{ fontSize: 14, color: "#71717a" }}>Loading...</div>
+      </div>
+    </div>
+  );
+
+  if (view === "auth") return <AuthPage mode={authMode} onSwitch={() => setAuthMode(authMode === "signin" ? "signup" : "signin")} onSuccess={handleAuthSuccess} />;
+  if (view === "app") return <NexusCustomerPortal onGoHome={() => setView("home")} onSignOut={handleSignOut} />;
+  return <HomePage onEnterApp={() => setView("auth")} />;
 }
