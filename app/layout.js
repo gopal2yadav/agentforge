@@ -1,15 +1,15 @@
 export const metadata = {
-  title: "AgentForge - Agentic AI Platform",
-  description: "Build, deploy, and manage persistent AI agents",
-};
+  title: 'Nexus — AI Agent Platform',
+  description: 'Build, orchestrate, and deploy autonomous AI agents that collaborate to solve complex tasks.',
+}
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
       </head>
-      <body style={{ margin: 0, background: "#0c0f14" }}>{children}</body>
+      <body style={{ margin: 0, padding: 0 }}>{children}</body>
     </html>
-  );
+  )
 }
