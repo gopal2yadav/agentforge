@@ -1,138 +1,62 @@
 @import "tailwindcss";
 
-@theme {
-  --color-nexus-900: #0a0a0f;
-  --color-nexus-800: #12121a;
-  --color-nexus-700: #1a1a27;
-  --color-nexus-600: #252536;
-  --color-nexus-500: #3a3a52;
-  --color-nexus-400: #6b6b8a;
-  --color-nexus-300: #9898b4;
-  --color-nexus-200: #c4c4d8;
-  --color-nexus-100: #e8e8f0;
-  --color-nexus-50: #f4f4f8;
-
-  --color-electric: #6366f1;
-  --color-electric-light: #818cf8;
-  --color-electric-glow: rgba(99, 102, 241, 0.25);
-  --color-plasma: #ec4899;
-  --color-plasma-light: #f472b6;
-  --color-neon: #22d3ee;
-  --color-neon-light: #67e8f9;
-  --color-pulse: #22c55e;
-  --color-pulse-light: #4ade80;
-  --color-amber: #f59e0b;
-  --color-danger: #ef4444;
-
-  --font-display: 'Clash Display', 'Satoshi', system-ui, sans-serif;
-  --font-body: 'Satoshi', 'General Sans', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+:root {
+  --nexus-50: #f0f0f5;
+  --nexus-100: #e0e0e8;
+  --nexus-200: #c0c0d0;
+  --nexus-300: #a0a0b8;
+  --nexus-400: #6b6b8a;
+  --nexus-500: #4a4a5a;
+  --nexus-600: #3a3a4d;
+  --nexus-700: #2a2a3d;
+  --nexus-800: #14141f;
+  --nexus-900: #0a0a0f;
+  --electric: #6366f1;
+  --electric-light: #818cf8;
+  --neon: #22d3ee;
+  --plasma: #a855f7;
+  --pulse: #22c55e;
+  --danger: #ef4444;
+  --amber: #f59e0b;
 }
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 239 84% 67%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 239 84% 67%;
-  }
-
-  .dark {
-    --background: 240 20% 4%;
-    --foreground: 0 0% 97%;
-    --card: 240 17% 7%;
-    --card-foreground: 0 0% 97%;
-    --popover: 240 17% 7%;
-    --popover-foreground: 0 0% 97%;
-    --primary: 239 84% 67%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 12% 14%;
-    --secondary-foreground: 0 0% 97%;
-    --muted: 240 12% 14%;
-    --muted-foreground: 240 5% 55%;
-    --accent: 240 12% 14%;
-    --accent-foreground: 0 0% 97%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 10% 15%;
-    --input: 240 10% 15%;
-    --ring: 239 84% 67%;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@layer base {
-  * { @apply border-border; }
-  body { @apply bg-background text-foreground antialiased; }
+body {
+  background-color: #0a0a0f;
+  color: #e0e0e8;
+  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Custom Animations ───────────────────────────────────── */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: white;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-@keyframes orbit {
-  from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-@keyframes data-stream {
-  0% { transform: translateY(-100%); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { transform: translateY(100vh); opacity: 0; }
+::-webkit-scrollbar-thumb {
+  background: #2a2a3d;
+  border-radius: 3px;
 }
 
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
-.animate-orbit { animation: orbit 20s linear infinite; }
-
-/* ─── Swarm Particle Effects ──────────────────────────────── */
-.swarm-particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--color-electric);
-  box-shadow: 0 0 8px var(--color-electric-glow);
-  animation: orbit var(--duration, 20s) linear infinite;
-  animation-delay: var(--delay, 0s);
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a4d;
 }
 
-/* ─── Glassmorphism ───────────────────────────────────────── */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.glass-strong {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(40px) saturate(2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+input, textarea, select {
+  font-family: inherit;
 }
