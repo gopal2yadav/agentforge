@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { Toaster } from 'sonner';
+import { Analytics } from '@vercel/analytics/next';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               },
             }}
           />
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
