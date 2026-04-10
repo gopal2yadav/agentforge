@@ -40,7 +40,9 @@
     "zod": "^3.24.0",
     "nanoid": "^5.0.0",
     "date-fns": "^4.1.0",
-    "sonner": "^1.7.0"
+    "sonner": "^1.7.0",
+    "svix": "^1.40.0",
+    "@clerk/themes": "^2.1.0"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
