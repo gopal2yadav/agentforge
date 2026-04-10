@@ -22,164 +22,207 @@ model User {
   apiCallsToday Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  agents Agent[]
-  flows Flow[]
-  apiKeys ApiKey[]
-  executions Execution[]
-  memories Memory[]
-  @Andex([clerkId])
+
+  agents        Agent[]
+  flows         Flow[]
+  apiKeys       ApiKey[]
+  executions    Execution[]
+  memories      Memory[]
+
+  @@index([clerkId])
 }
 
-enum Plan { FREE PRO ENTERPRISE }
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
 
 model ApiKey {
-  id String @id @default(cuid())
-  userId String
-  name String
-  keyHash String @unique
-  prefix String
-  lastUsed DateTime?
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  keyHash   String   @unique
+  prefix    String
+  lastUsed  DateTime?
   createdAt DateTime @default(now())
   revokedAt DateTime?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
 model Agent {
-  id String @id @default(cuid())
-  userId String
-  name String
-  description String?
-  role String?
-  systemPrompt String? @db.Text
-  model String @default("claude-sonnet-4-20250514")
-  provider Provider @default(ANTHROPIC)
-  tools Json @default("[]")
-  config Json @default("{}")
-  status AgentStatus @default(IDLE)
-  totalRuns Int @default(0)
-  successCount Int @default(0)
-  avgLatencyMs Int @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  flowNodes FlowNode[]
-  executions Execution[]
-  @Andex([userId])
-}
+  id            String      @id @default(cuid())
+  userId        String
+  name          String
+  description   String?
+  role          String?
+  systemPrompt  String?     @db.Text
+  model         String      @default("claude-sonnet-4-20250514")
+  provider      Provider    @default(ANTHROPIC)
+  tools         Json        @default("[]")
+  config        Json        @default("{}")
+  status        AgentStatus @default(IDLE)
+  totalRuns     Int         @default(0)
+  successCount  Int         @default(0)
+  avgLatencyMs  Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
-enum Provider { ANTHROPIC OPENAI GROQ }
-enum AgentStatus { ACTIVE IDLE ERROR PAUSED }
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flowNodes     FlowNode[]
+  executions    Execution[]
 
-model Flow {
-  id String @id @default(cuid())
-  userId String
-  name String
-  description String?
-  status FlowStatus @default(DRAFT)
-  config Json @default("{}")
-  totalRuns Int @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  nodes FlowNode[]
-  edges FlowEdge[]
-  executions Execution[]
   @@index([userId])
 }
 
-enum FlowStatus { DRAFT ACTIVE PAUSED ARCHIVED }
+enum Provider {
+  ANTHROPIC
+  OPENAI
+  GROQ
+}
+
+enum AgentStatus {
+  ACTIVE
+  IDLE
+  ERROR
+  PAUSED
+}
+
+model Flow {
+  id          String     @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  status      FlowStatus @default(DRAFT)
+  config      Json       @default("{}")
+  totalRuns   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodes       FlowNode[]
+  edges       FlowEdge[]
+  executions  Execution[]
+
+  @@index([userId])
+}
+
+enum FlowStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
 
 model FlowNode {
-  id String @id @default(cuid())
-  flowId String
-  agentId String?
-  type String
-  label String
-  config Json @default("{}")
-  positionX Float @default(0)
-  positionY Float @default(0)
-  flow Flow @relation(fields: [flowId], references: [id], onDelete: Cascade)
-  agent Agent? @relation(fields: [agentId], references: [id])
+  id        String   @id @default(cuid())
+  flowId    String
+  agentId   String?
+  type      String
+  label     String
+  config    Json     @default("{}")
+  positionX Float    @default(0)
+  positionY Float    @default(0)
+
+  flow      Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  agent     Agent?   @relation(fields: [agentId], references: [id])
   sourceEdges FlowEdge[] @relation("SourceNode")
   targetEdges FlowEdge[] @relation("TargetNode")
+
   @@index([flowId])
 }
 
 model FlowEdge {
-  id String @id @default(cuid())
-  flowId String
+  id           String   @id @default(cuid())
+  flowId       String
   sourceNodeId String
   targetNodeId String
-  condition String?
-  label String?
-  flow Flow @relation(fields: [flowId], references: [id], onDelete: Cascade)
-  sourceNode FlowNode @relation("SourceNode", fields: [sourceNodeId], references: [id], onDelete: Cascade)
-  targetNode FlowNode @relation("TargetNode", fields: [targetNodeId], references: [id], onDelete: Cascade)
+  condition    String?
+  label        String?
+
+  flow         Flow     @relation(fields: [flowId], references: [id], onDelete: Cascade)
+  sourceNode   FlowNode @relation("SourceNode", fields: [sourceNodeId], references: [id], onDelete: Cascade)
+  targetNode   FlowNode @relation("TargetNode", fields: [targetNodeId], references: [id], onDelete: Cascade)
+
   @@index([flowId])
 }
 
 model Execution {
-  id String @id @default(cuid())
-  userId String
-  agentId String?
-  flowId String?
-  input Json
-  output Json?
-  status ExecutionStatus @default(RUNNING)
-  tokensUsed Int @default(0)
-  latencyMs Int @default(0)
-  error String? @db.Text
-  startedAt DateTime @default(now())
+  id          String          @id @default(cuid())
+  userId      String
+  agentId     String?
+  flowId      String?
+  input       Json
+  output      Json?
+  status      ExecutionStatus @default(RUNNING)
+  tokensUsed  Int             @default(0)
+  latencyMs   Int             @default(0)
+  error       String?         @db.Text
+  startedAt   DateTime        @default(now())
   completedAt DateTime?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  agent Agent? @relation(fields: [agentId], references: [id])
-  flow Flow? @relation(fields: [flowId], references: [id])
-  traces Trace[]
+
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent       Agent?          @relation(fields: [agentId], references: [id])
+  flow        Flow?           @relation(fields: [flowId], references: [id])
+  traces      Trace[]
+
   @@index([userId])
   @@index([agentId])
   @@index([startedAt])
 }
 
-enum ExecutionStatus { RUNNING COMPLETED FAILED CANCELLED }
+enum ExecutionStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
 
 model Trace {
-  id String @id @default(cuid())
+  id          String   @id @default(cuid())
   executionId String
-  step Int
-  agentName String?
-  action String
-  input Json?
-  output Json?
-  tokensUsed Int @default(0)
-  latencyMs Int @default(0)
-  timestamp DateTime @default(now())
-  execution Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  step        Int
+  agentName   String?
+  action      String
+  input       Json?
+  output      Json?
+  tokensUsed  Int      @default(0)
+  latencyMs   Int      @default(0)
+  timestamp   DateTime @default(now())
+
+  execution   Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+
   @@index([executionId])
 }
 
 model Memory {
-  id String @id @default(cuid())
-  userId String
-  scope String
-  content String @db.Text
-  embedding Float[]
-  importance Float @default(0.5)
-  accessCount Int @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  userId      String
+  scope       String
+  content     String   @db.Text
+  embedding   Float[]
+  importance  Float    @default(0.5)
+  accessCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
 }
 
 model SwarmEvent {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
   agentName String
-  type String
-  action String
-  details Json
-  severity String @default("info")
-  resolved Boolean @default(false)
+  type      String
+  action    String
+  details   Json
+  severity  String   @default("info")
+  resolved  Boolean  @default(false)
   createdAt DateTime @default(now())
+
   @@index([createdAt])
 }
