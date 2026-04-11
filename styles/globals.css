@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --nexus-50: #f0f0f5;
@@ -12,51 +14,18 @@
   --nexus-800: #14141f;
   --nexus-900: #0a0a0f;
   --electric: #6366f1;
-  --electric-light: #818cf8;
-  --neon: #22d3ee;
-  --plasma: #a855f7;
-  --pulse: #22c55e;
-  --danger: #ef4444;
-  --amber: #f59e0b;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   background-color: #0a0a0f;
   color: #e0e0e8;
-  font-family: 'Satoshi', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-::selection {
-  background-color: rgba(99, 102, 241, 0.3);
-  color: white;
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #2a2a3d;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #3a3a4d;
-}
-
-input, textarea, select {
-  font-family: inherit;
-}
+::selection { background-color: rgba(99, 102, 241, 0.3); color: white; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a3d; border-radius: 3px; }
