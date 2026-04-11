@@ -5,7 +5,8 @@ import { usePathname } from 'next/navigation';
 const sections = [
   { title: 'BUILD', items: [
     { name: 'Dashboard', href: '/dashboard', icon: '\u2302' },
-    { name: 'Studio', href: '/studio', icon: '\u2726' },
+    { name: 'AI Builder', href: '/builder', icon: '\u2728' },
+    { name: 'Studio', href: '/studio', icon: '\u2610' },
     { name: 'Agents', href: '/agents', icon: '\u2699' },
     { name: 'Flows', href: '/flows', icon: '\u21C4' },
     { name: 'Automations', href: '/automations', icon: '\u26A1' },
@@ -18,7 +19,7 @@ const sections = [
   ]},
   { title: 'OBSERVE', items: [
     { name: 'Traces', href: '/traces', icon: '\u2261' },
-    { name: 'Deployments', href: '/deployments', icon: '\u2B06' },
+    { name: 'Deployments', href: '/deployments', icon: '\u2191' },
     { name: 'Monitoring', href: '/monitoring', icon: '\u2616' },
     { name: 'Logs', href: '/logs', icon: '\u2263' },
   ]},
