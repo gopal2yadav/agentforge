@@ -26,6 +26,8 @@ const sections = [
     { name: 'Logs', href: '/logs', icon: '\u2263' },
   ]},
   { title: 'MANAGE', items: [
+    { name: 'Notifications', href: '/notifications', icon: '\uD83D\uDD14' },
+    { name: 'Status', href: '/status', icon: '\u2661' },
     { name: 'Billing', href: '/billing', icon: '\u2605' },
     { name: 'Settings', href: '/settings', icon: '\u2638' },
   ]},
