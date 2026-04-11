@@ -1,12 +1,37 @@
-# Nexus AI Platform v2
+# Nexus — AI Agent Orchestration Platform
 
-Enterprise AI Agent Orchestration Platform deployed on Vercel.
+> Self-hosted platform for building, deploying, and managing AI agent workflows.
 
-## Tech Stack
-- **Framework**: Next.js 15 App Router + TypeScript
-- **Auth**: Clerk (free tier)
-- **Database**: Vercel Postgres + Prisma ORM
-- **AI**: AI SDK (@ai-sdk/anthropic, @ai-sdk/openai) + LangGraph.js
-- **UI**: Tailwind CSS v4 + Framer Motion + React Flow
-- **Billing**: Stripe ($49/mo Pro plan)
-- **Monitoring**: Built-in execution traces + Swarm agents
+## 🚀 Live
+
+**[agentforcecrew.com](https://agentforcecrew.com)**
+
+## 🏗️ Stack
+
+- **Framework:** Next.js 15.5 + TypeScript
+- **Auth:** Clerk
+- **Database:** PostgreSQL (Prisma ORM)
+- **Billing:** Stripe
+- **UI:** Tailwind CSS + React Flow (DAG editor)
+- **Hosting:** Vercel
+
+## 📋 Features
+
+- **Agent Management** — Create, configure, and monitor AI agents
+- **Visual Flow Editor** — Drag-and-drop DAG editor for multi-agent workflows
+- **Memory System** — Persistent agent memory with scoped retrieval
+- **Billing** — Stripe-powered subscription plans (Free / Pro / Enterprise)
+- **API** — RESTful API for programmatic agent execution
+- **Real-time Dashboard** — Execution metrics, token usage, latency tracking
+
+## 🔧 Setup
+
+1. Clone the repo
+2. `npm install`
+3. Configure environment variables (Clerk, Stripe, Postgres)
+4. `npx prisma generate && npx prisma db push`
+5. `npm run dev`
+
+## 📄 License
+
+MIT
