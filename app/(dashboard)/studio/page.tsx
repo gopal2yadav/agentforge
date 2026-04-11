@@ -1,134 +1,63 @@
 'use client';
 import { useState } from 'react';
-
-const DEMO_CREW = {
-  name: 'Content Pipeline',
-  agents: [
-    { id: 'a1', name: 'Researcher', role: 'Research Analyst', model: 'claude-sonnet-4' },
-    { id: 'a2', name: 'Writer', role: 'Content Writer', model: 'claude-sonnet-4' },
-    { id: 'a3', name: 'Editor', role: 'Quality Editor', model: 'gpt-4o' },
-  ],
-  tasks: [
-    { id: 't1', name: 'Research Topic', agent: 'Researcher', output: 'Research report with sources' },
-    { id: 't2', name: 'Write Draft', agent: 'Writer', output: 'First draft of content' },
-    { id: 't3', name: 'Review & Polish', agent: 'Editor', output: 'Final polished content' },
-  ],
-};
-
+import { useRouter } from 'next/navigation';
 export default function StudioPage() {
-  const [crew] = useState(DEMO_CREW);
-  const [activeTab, setActiveTab] = useState('agents');
-
+  const router = useRouter();
+  const [showNewCrew, setShowNewCrew] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [crewName, setCrewName] = useState('');
+  const [importText, setImportText] = useState('');
+  const [created, setCreated] = useState(false);
+  const crews = [
+    { id: 'c1', name: 'Content Pipeline', agents: 3, tasks: 4, status: 'active', lastRun: '15 min ago', runs: 142 },
+    { id: 'c2', name: 'Lead Qualifier', agents: 2, tasks: 3, status: 'active', lastRun: '1 hour ago', runs: 89 },
+    { id: 'c3', name: 'Code Review Crew', agents: 2, tasks: 2, status: 'idle', lastRun: '3 hours ago', runs: 67 },
+  ];
+  const handleCreate = () => { if (!crewName.trim()) return; setCreated(true); setTimeout(() => { setShowNewCrew(false); setCreated(false); setCrewName(''); }, 2000); };
+  const handleImport = () => { if (!importText.trim()) return; alert('YAML imported! Crew configuration parsed successfully.'); setShowImport(false); setImportText(''); };
   return (
-    <div className="max-w-[1200px] mx-auto">
+    <div className="max-w-[1100px] mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Crew Studio</h1>
-          <p className="text-sm text-gray-500">Design and configure multi-agent crews visually</p>
-        </div>
+        <div><h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Crew Studio</h1><p className="text-sm text-gray-500">Design and manage multi-agent crews</p></div>
         <div className="flex gap-2">
-          <button className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-500 hover:text-gray-900">Import YAML</button>
-          <button className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">+ New Crew</button>
+          <button onClick={() => { setShowImport(!showImport); setShowNewCrew(false); }} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:text-gray-900 hover:border-gray-300 transition-colors">Import YAML</button>
+          <button onClick={() => { setShowNewCrew(!showNewCrew); setShowImport(false); }} className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">+ New Crew</button>
         </div>
       </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm mb-6 p-5">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">C</div>
-          <div>
-            <div className="text-lg font-bold text-gray-900">{crew.name}</div>
-            <div className="text-xs text-gray-400">{crew.agents.length} agents \u00B7 {crew.tasks.length} tasks \u00B7 Sequential process</div>
-          </div>
-        </div>
-
-        <div className="flex gap-2 mb-4 border-b border-gray-100">
-          {['agents', 'tasks', 'config'].map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
-              className={"px-4 py-2 text-sm font-medium border-b-2 transition-colors " + (activeTab === tab ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600')}>
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {activeTab === 'agents' && (
-          <div className="space-y-3">
-            {crew.agents.map((agent, i) => (
-              <div key={agent.id} className="bg-gray-50 border border-gray-100 rounded-lg p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold">{i + 1}</div>
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">{agent.name}</div>
-                    <div className="text-[11px] text-gray-400">{agent.role} \u00B7 {agent.model}</div>
-                  </div>
-                </div>
-                <button className="text-xs text-gray-400 hover:text-indigo-600">Edit</button>
-              </div>
-            ))}
-            <button className="w-full py-3 border border-dashed border-gray-200 rounded-lg text-sm text-gray-400 hover:text-indigo-600 hover:border-indigo-300">+ Add Agent</button>
-          </div>
-        )}
-
-        {activeTab === 'tasks' && (
-          <div className="space-y-3">
-            {crew.tasks.map((task, i) => (
-              <div key={task.id} className="bg-gray-50 border border-gray-100 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Task {i + 1}</span>
-                    <span className="text-sm font-semibold text-gray-900">{task.name}</span>
-                  </div>
-                  <span className="text-[11px] text-gray-400">Agent: {task.agent}</span>
-                </div>
-                <div className="text-xs text-gray-500">Expected output: {task.output}</div>
-              </div>
-            ))}
-            <button className="w-full py-3 border border-dashed border-gray-200 rounded-lg text-sm text-gray-400 hover:text-indigo-600 hover:border-indigo-300">+ Add Task</button>
-          </div>
-        )}
-
-        {activeTab === 'config' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Process Type</label>
-                <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900">
-                  <option>Sequential</option><option>Hierarchical</option><option>Parallel</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Memory</label>
-                <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900">
-                  <option>Enabled</option><option>Disabled</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Max RPM</label>
-                <input type="number" defaultValue={10} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900" />
-              </div>
-              <div>
-                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Verbose</label>
-                <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900">
-                  <option>True</option><option>False</option>
-                </select>
-              </div>
+      {showNewCrew && (
+        <div className="bg-white border border-indigo-200 rounded-xl p-5 shadow-sm mb-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Create New Crew</h3>
+          {created ? (<div className="flex items-center gap-2 text-sm text-emerald-600 font-medium"><span>\u2713</span> Crew created! Redirecting to editor...</div>) : (
+            <div className="flex gap-3">
+              <input type="text" value={crewName} onChange={e => setCrewName(e.target.value)} placeholder="Crew name (e.g., Marketing Pipeline)"
+                className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500" />
+              <button onClick={handleCreate} disabled={!crewName.trim()} className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">Create</button>
+              <button onClick={() => setShowNewCrew(false)} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-500">Cancel</button>
             </div>
-          </div>
-        )}
-      </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Pipeline Preview</h3>
-        <div className="flex items-center gap-3">
-          {crew.tasks.map((task, i) => (
-            <div key={task.id} className="flex items-center gap-3">
-              <div className="bg-indigo-50 border border-indigo-100 rounded-lg px-4 py-3 text-center min-w-[140px]">
-                <div className="text-xs font-semibold text-indigo-700">{task.name}</div>
-                <div className="text-[10px] text-gray-400 mt-0.5">{task.agent}</div>
-              </div>
-              {i < crew.tasks.length - 1 && <span className="text-gray-300 text-lg">\u2192</span>}
-            </div>
-          ))}
+          )}
         </div>
+      )}
+      {showImport && (
+        <div className="bg-white border border-indigo-200 rounded-xl p-5 shadow-sm mb-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">Import YAML Configuration</h3>
+          <textarea value={importText} onChange={e => setImportText(e.target.value)} rows={5} placeholder={'agents:\n  - role: Research Analyst\n    goal: Conduct thorough research\n    backstory: Expert analyst with 10+ years...\n    tools: [web_search, summarizer]'}
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-xs font-mono text-gray-700 placeholder-gray-400 resize-none focus:outline-none focus:border-indigo-500 mb-3" />
+          <div className="flex gap-2">
+            <button onClick={handleImport} disabled={!importText.trim()} className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">Import</button>
+            <button onClick={() => setShowImport(false)} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-500">Cancel</button>
+          </div>
+        </div>
+      )}
+      <div className="space-y-3">
+        {crews.map(c => (
+          <div key={c.id} onClick={() => router.push('/flows/editor')} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all cursor-pointer">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-3"><div className={'w-2 h-2 rounded-full ' + (c.status === 'active' ? 'bg-emerald-500' : 'bg-gray-400')} /><div className="text-[15px] font-semibold text-gray-900">{c.name}</div></div>
+              <span className={'px-2.5 py-1 rounded-full text-[10px] font-semibold ' + (c.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500')}>{c.status}</span>
+            </div>
+            <div className="flex items-center gap-6 text-xs text-gray-400"><span>{c.agents} agents</span><span>{c.tasks} tasks</span><span>{c.runs} runs</span><span>Last: {c.lastRun}</span></div>
+          </div>
+        ))}
       </div>
     </div>
   );
