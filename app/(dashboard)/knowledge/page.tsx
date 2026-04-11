@@ -1,64 +1,31 @@
 'use client';
 import { useState } from 'react';
-
-const SOURCES = [
-  { id: '1', name: 'Company Policies', type: 'PDF', docs: 12, chunks: 847, lastSync: '2 hours ago', status: 'synced', size: '4.2 MB' },
-  { id: '2', name: 'Product Documentation', type: 'Markdown', docs: 34, chunks: 2103, lastSync: '1 hour ago', status: 'synced', size: '8.1 MB' },
-  { id: '3', name: 'Customer FAQ', type: 'CSV', docs: 1, chunks: 156, lastSync: '30 min ago', status: 'synced', size: '245 KB' },
-  { id: '4', name: 'Sales Playbook', type: 'DOCX', docs: 5, chunks: 312, lastSync: 'Syncing...', status: 'syncing', size: '2.8 MB' },
-];
-
 export default function KnowledgePage() {
-  const [showUpload, setShowUpload] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
+  const docs = [
+    { name: 'Company Policies', type: 'PDF', chunks: 312, size: '2.8 MB', status: 'indexed', updated: '2 days ago' },
+    { name: 'Sales Playbook', type: 'DOCX', chunks: 189, size: '1.2 MB', status: 'indexed', updated: '5 days ago' },
+    { name: 'API Documentation', type: 'MD', chunks: 456, size: '890 KB', status: 'indexed', updated: '1 week ago' },
+    { name: 'Product Roadmap', type: 'PDF', chunks: 78, size: '450 KB', status: 'processing', updated: '1 hour ago' },
+  ];
+  const handleUpload = () => { setUploading(true); setTimeout(() => { setUploading(false); setUploaded(true); setTimeout(() => setUploaded(false), 3000); }, 2000); };
   return (
     <div className="max-w-[1000px] mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Knowledge Base</h1>
-          <p className="text-sm text-gray-500">Upload documents and data sources for your agents</p>
-        </div>
-        <button onClick={() => setShowUpload(!showUpload)} className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm">+ Add Source</button>
+        <div><h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Knowledge Base</h1><p className="text-sm text-gray-500">{docs.length} documents &bull; {docs.reduce((a, d) => a + d.chunks, 0)} chunks indexed</p></div>
       </div>
-      {showUpload && (
-        <div className="bg-white border-2 border-dashed border-indigo-200 rounded-xl p-8 mb-4 text-center">
-          <div className="text-3xl mb-3 text-indigo-400">\u2191</div>
-          <div className="text-sm font-semibold text-gray-900 mb-1">Upload Documents</div>
-          <div className="text-xs text-gray-500 mb-4">Drag and drop PDF, DOCX, CSV, MD, or TXT files</div>
-          <div className="flex items-center justify-center gap-3">
-            <button className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold">Browse Files</button>
-            <button className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600">Connect URL</button>
-            <button onClick={() => setShowUpload(false)} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-400">Cancel</button>
-          </div>
-        </div>
-      )}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        {[{ l: 'Sources', v: SOURCES.length }, { l: 'Documents', v: SOURCES.reduce((a,s) => a+s.docs, 0) }, { l: 'Chunks', v: SOURCES.reduce((a,s) => a+s.chunks, 0).toLocaleString() }, { l: 'Total Size', v: '15.3 MB' }].map(m => (
-          <div key={m.l} className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-            <div className="text-[11px] text-gray-400 uppercase tracking-wider">{m.l}</div>
-            <div className="text-2xl font-bold mt-1 text-gray-900">{m.v}</div>
-          </div>
-        ))}
+      <div onClick={handleUpload} className={'border-2 border-dashed rounded-xl p-8 text-center mb-6 transition-all cursor-pointer ' + (uploading ? 'border-indigo-400 bg-indigo-50' : uploaded ? 'border-emerald-400 bg-emerald-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50')}>
+        {uploading ? (<div><div className="w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" /><div className="text-sm text-indigo-600 font-medium">Processing document...</div><div className="text-xs text-indigo-400 mt-1">Extracting text, chunking, generating embeddings</div></div>
+        ) : uploaded ? (<div><div className="text-2xl mb-2">\u2713</div><div className="text-sm text-emerald-600 font-medium">Document uploaded and indexed!</div><div className="text-xs text-emerald-500 mt-1">142 chunks created &bull; Ready for RAG retrieval</div></div>
+        ) : (<div><div className="text-2xl text-gray-300 mb-2">+</div><div className="text-sm text-gray-500">Click to upload documents</div><div className="text-xs text-gray-400 mt-1">Supports PDF, DOCX, TXT, CSV, MD &bull; Max 50MB</div></div>)}
       </div>
-      <div className="space-y-3">
-        {SOURCES.map(s => (
-          <div key={s.id} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-200 hover:shadow-md transition-all shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-[10px] font-bold text-indigo-600">{s.type}</div>
-                <div>
-                  <div className="text-sm font-semibold text-gray-900">{s.name}</div>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-[10px] text-gray-400">{s.docs} docs</span>
-                    <span className="text-[10px] text-gray-400">{s.chunks.toLocaleString()} chunks</span>
-                    <span className="text-[10px] text-gray-400">{s.size}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-[10px] text-gray-400">{s.lastSync}</span>
-                <span className={"px-2 py-0.5 rounded-full text-[9px] font-bold " + (s.status === 'synced' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700')}>{s.status}</span>
-              </div>
-            </div>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-5 py-3 border-b border-gray-100"><h3 className="text-sm font-semibold text-gray-900">Indexed Documents</h3></div>
+        {docs.map((d, i) => (
+          <div key={i} className={'px-5 py-3.5 flex items-center justify-between' + (i < docs.length - 1 ? ' border-b border-gray-100' : '') + ' hover:bg-gray-50 transition-colors'}>
+            <div className="flex items-center gap-3"><div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 text-[10px] font-bold">{d.type}</div><div><div className="text-sm font-medium text-gray-900">{d.name}</div><div className="text-[10px] text-gray-400">{d.chunks} chunks &bull; {d.size} &bull; Updated {d.updated}</div></div></div>
+            <span className={'px-2 py-0.5 rounded-full text-[9px] font-semibold ' + (d.status === 'indexed' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600')}>{d.status}</span>
           </div>
         ))}
       </div>
