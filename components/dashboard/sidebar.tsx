@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 const sections = [
   { title: 'BUILD', items: [
     { name: 'Dashboard', href: '/dashboard', icon: '\u2302' },
+    { name: 'Studio', href: '/studio', icon: '\u2726' },
     { name: 'Agents', href: '/agents', icon: '\u2699' },
     { name: 'Flows', href: '/flows', icon: '\u21C4' },
     { name: 'Automations', href: '/automations', icon: '\u26A1' },
@@ -17,6 +18,7 @@ const sections = [
   ]},
   { title: 'OBSERVE', items: [
     { name: 'Traces', href: '/traces', icon: '\u2261' },
+    { name: 'Deployments', href: '/deployments', icon: '\u2B06' },
     { name: 'Monitoring', href: '/monitoring', icon: '\u2616' },
     { name: 'Logs', href: '/logs', icon: '\u2263' },
   ]},
@@ -55,7 +57,7 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
-      <div className="px-4 py-3 border-t border-[#1e1e2e] text-[10px] text-[#4a4a5a]">Nexus v2.1.0</div>
+      <div className="px-4 py-3 border-t border-[#1e1e2e] text-[10px] text-[#4a4a5a]">Nexus v2.2.0</div>
     </aside>
   );
 }
