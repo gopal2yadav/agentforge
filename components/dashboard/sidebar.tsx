@@ -8,6 +8,7 @@ const sections = [
     { name: 'AI Builder', href: '/builder', icon: '\u2728' },
     { name: 'Studio', href: '/studio', icon: '\u2610' },
     { name: 'Agents', href: '/agents', icon: '\u2699' },
+    { name: 'Templates', href: '/templates', icon: '\u2606' },
     { name: 'Flows', href: '/flows', icon: '\u21C4' },
     { name: 'Automations', href: '/automations', icon: '\u26A1' },
     { name: 'Playground', href: '/playground', icon: '\u25B6' },
@@ -19,7 +20,8 @@ const sections = [
   ]},
   { title: 'OBSERVE', items: [
     { name: 'Traces', href: '/traces', icon: '\u2261' },
-    { name: 'Deployments', href: '/deployments', icon: '\u2191' },
+    { name: 'Analytics', href: '/analytics', icon: '\u2235' },
+    { name: 'Activity', href: '/activity', icon: '\u2690' },
     { name: 'Monitoring', href: '/monitoring', icon: '\u2616' },
     { name: 'Logs', href: '/logs', icon: '\u2263' },
   ]},
@@ -41,15 +43,15 @@ export function Sidebar() {
       </div>
       <nav className="flex-1 px-3 py-2 overflow-y-auto">
         {sections.map((section) => (
-          <div key={section.title} className="mb-3">
-            <div className="px-3 py-1.5 text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">{section.title}</div>
+          <div key={section.title} className="mb-2">
+            <div className="px-3 py-1 text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">{section.title}</div>
             <div className="space-y-0.5">
               {section.items.map((item) => {
                 const active = pathname === item.href || (pathname || '').startsWith(item.href + '/');
                 return (
                   <Link key={item.href} href={item.href}
-                    className={`flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] transition-colors ${active ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
-                    <span className="text-sm">{item.icon}</span>
+                    className={`flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[13px] transition-colors ${active ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
+                    <span className="text-sm opacity-70">{item.icon}</span>
                     {item.name}
                   </Link>
                 );
@@ -58,7 +60,12 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
-      <div className="px-4 py-3 border-t border-gray-100 text-[10px] text-gray-400">Nexus v2.2.0</div>
+      <div className="px-3 py-2 border-t border-gray-100">
+        <Link href="/getting-started" className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
+          <span className="text-sm">\u2139</span> Getting Started
+        </Link>
+      </div>
+      <div className="px-4 py-2 text-[10px] text-gray-300">Nexus v2.2.0</div>
     </aside>
   );
 }
