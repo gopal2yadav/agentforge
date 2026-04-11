@@ -3,13 +3,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const nav = [
-  { name: 'Dashboard', href: '/dashboard', icon: '⌂' },
-  { name: 'Agents', href: '/agents', icon: '⚙' },
-  { name: 'Flows', href: '/flows', icon: '↔' },
-  { name: 'Memory', href: '/memory', icon: '☁' },
-  { name: 'Playground', href: '/playground', icon: '▶' },
-  { name: 'Billing', href: '/billing', icon: '★' },
-  { name: 'Settings', href: '/settings', icon: '☸' },
+  { name: 'Dashboard', href: '/dashboard', icon: '\u2302' },
+  { name: 'Agents', href: '/agents', icon: '\u2699' },
+  { name: 'Flows', href: '/flows', icon: '\u2194' },
+  { name: 'Memory', href: '/memory', icon: '\u2601' },
+  { name: 'Playground', href: '/playground', icon: '\u25B6' },
+  { name: 'Monitoring', href: '/monitoring', icon: '\u2261' },
+  { name: 'Billing', href: '/billing', icon: '\u2605' },
+  { name: 'Settings', href: '/settings', icon: '\u2638' },
 ];
 
 export function Sidebar() {
@@ -24,7 +25,7 @@ export function Sidebar() {
       </div>
       <nav className="flex-1 p-3 space-y-0.5">
         {nav.map((item) => {
-          const active = pathname === item.href || pathname?.startsWith(item.href + '/');
+          const active = pathname === item.href || (pathname && pathname.startsWith(item.href + '/'));
           return (
             <Link key={item.href} href={item.href}
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${active ? 'bg-[#6366f1]/15 text-white font-medium' : 'text-[#6b6b8a] hover:text-white hover:bg-[#1a1a2e]'}`}>
