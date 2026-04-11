@@ -1,23 +1,34 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
-import { db } from '@/lib/db';
-import { getOrCreateUser, PLAN_LIMITS } from '@/lib/utils';
+import { NextResponse } from 'next/server';
+
+const DEMO_AGENTS = [
+  { id: '1', name: 'Research Agent', description: 'Autonomous web research and summarization', model: 'claude-sonnet-4-20250514', provider: 'ANTHROPIC', status: 'ACTIVE', systemPrompt: 'You are a research agent...', totalRuns: 142, successCount: 138, avgLatencyMs: 1850, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '2', name: 'Code Reviewer', description: 'Reviews PRs and suggests improvements', model: 'claude-sonnet-4-20250514', provider: 'ANTHROPIC', status: 'IDLE', systemPrompt: 'You review code...', totalRuns: 89, successCount: 85, avgLatencyMs: 2100, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+  { id: '3', name: 'Data Analyst', description: 'Processes CSV data and generates insights', model: 'gpt-4o', provider: 'OPENAI', status: 'ACTIVE', systemPrompt: 'You analyze data...', totalRuns: 67, successCount: 61, avgLatencyMs: 3200, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+];
 
 export async function GET() {
-  try {
-    const user = await getOrCreateUser();
-    return NextResponse.json(await db.agent.findMany({ where: { userId: user.id }, orderBy: { updatedAt: 'desc' } }));
-  } catch (e) { return NextResponse.json({ error: e.message }, { status: 401 }); }
+  return NextResponse.json({ agents: DEMO_AGENTS, total: DEMO_AGENTS.length });
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const user = await getOrCreateUser();
     const body = await req.json();
-    const count = await db.agent.count({ where: { userId: user.id } });
-    const limit = PLAN_LIMITS[user.plan].agents;
-    if (count >= limit) return NextResponse.json({ error: `Limit reached (${limit})` }, { status: 403 });
-    const agent = await db.agent.create({ data: { userId: user.id, name: body.name, role: body.role, description: body.description, systemPrompt: body.systemPrompt, model: body.model||'claude-sonnet-4-20250514', provider: body.model?.includes('gpt')?'OPENAI':'ANTHROPIC', tools: body.tools||[], config: body.config||{} } });
-    return NextResponse.json(agent, { status: 201 });
-  } catch (e) { return NextResponse.json({ error: e.message }, { status: 500 }); }
+    const newAgent = {
+      id: String(Date.now()),
+      name: body.name || 'New Agent',
+      description: body.description || '',
+      model: body.model || 'claude-sonnet-4-20250514',
+      provider: body.provider || 'ANTHROPIC',
+      status: 'IDLE',
+      systemPrompt: body.systemPrompt || '',
+      totalRuns: 0,
+      successCount: 0,
+      avgLatencyMs: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    return NextResponse.json(newAgent, { status: 201 });
+  } catch (e) {
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+  }
 }
