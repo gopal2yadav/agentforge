@@ -10,3 +10,4 @@ Enterprise AI Agent Orchestration Platform deployed on Vercel.
 - **UI**: Tailwind CSS v4 + Framer Motion + React Flow
 - **Billing**: Stripe ($49/mo Pro plan)
 - **Monitoring**: Built-in execution traces + Swarm agents
+
