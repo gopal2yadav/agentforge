@@ -1,25 +1,51 @@
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import { UserProfile } from '@clerk/nextjs';
-import { db } from '@/lib/db';
-
 export default async function SettingsPage() {
-  const { userId } = await auth();
-  if (!userId) redirect('/sign-in');
-  const user = await db.user.findUnique({ where: { clerkId: userId } });
   return (
     <div className="max-w-[800px] mx-auto">
-      <h1 className="text-2xl font-display font-bold mb-1">Settings</h1>
-      <p className="text-sm text-nexus-400 mb-6">Manage your account</p>
-      <div className="bg-nexus-800/40 border border-nexus-700/30 rounded-xl p-6 mb-6">
-        <h3 className="text-sm font-semibold mb-4">Account Details</h3>
-        <div className="text-sm space-y-2">
-          <div className="flex justify-between"><span className="text-nexus-400">Plan</span><span className="font-bold">{user?.plan||'FREE'}</span></div>
-          <div className="flex justify-between"><span className="text-nexus-400">Tokens</span><span className="font-bold">{((user?.tokensUsed||0)/1000).toFixed(0)}K / {((user?.tokensLimit||100000)/1000).toFixed(0)}K</span></div>
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Settings</h1>
+      <p className="text-sm text-[#6b6b8a] mb-8">Manage your account and platform configuration</p>
+      
+      <div className="space-y-6">
+        <div className="bg-[#14141f]/40 border border-[#2a2a3d] rounded-xl p-6">
+          <h3 className="text-base font-semibold mb-4">Account</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center py-2 border-b border-[#2a2a3d]">
+              <span className="text-sm text-[#6b6b8a]">Email</span>
+              <span className="text-sm">gopal@aabhyasa.com</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b border-[#2a2a3d]">
+              <span className="text-sm text-[#6b6b8a]">Plan</span>
+              <span className="text-sm font-semibold text-[#6366f1]">Pro</span>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <span className="text-sm text-[#6b6b8a]">Member since</span>
+              <span className="text-sm">April 2026</span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="bg-nexus-800/40 border border-nexus-700/30 rounded-xl overflow-hidden">
-        <UserProfile appearance={{ elements: { rootBox: 'w-full', cardBox: 'shadow-none w-full' } }} />
+
+        <div className="bg-[#14141f]/40 border border-[#2a2a3d] rounded-xl p-6">
+          <h3 className="text-base font-semibold mb-4">API Configuration</h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center py-2 border-b border-[#2a2a3d]">
+              <span className="text-sm text-[#6b6b8a]">Default Model</span>
+              <span className="text-sm font-mono">claude-sonnet-4</span>
+            </div>
+            <div className="flex justify-between items-center py-2 border-b border-[#2a2a3d]">
+              <span className="text-sm text-[#6b6b8a]">Rate Limit</span>
+              <span className="text-sm">5,000 calls/day</span>
+            </div>
+            <div className="flex justify-between items-center py-2">
+              <span className="text-sm text-[#6b6b8a]">Token Limit</span>
+              <span className="text-sm">10M tokens/month</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#14141f]/40 border border-amber-500/20 rounded-xl p-6">
+          <h3 className="text-base font-semibold mb-2">Database Setup</h3>
+          <p className="text-sm text-[#6b6b8a] mb-3">Connect a PostgreSQL database to enable persistent data storage for agents, flows, and executions.</p>
+          <p className="text-xs text-amber-500/80">Go to Vercel → Storage → Create Database → Neon Serverless Postgres to set up.</p>
+        </div>
       </div>
     </div>
   );
