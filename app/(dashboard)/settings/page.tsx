@@ -1,50 +1,48 @@
+import Link from 'next/link';
 export default function SettingsPage() {
+  const sections = [
+    { title: 'Account', items: [
+      { name: 'General', desc: 'Email, plan, and profile settings', href: '/settings' },
+      { name: 'Team', desc: 'Manage members and permissions', href: '/settings/team' },
+      { name: 'Security', desc: '2FA, SSO, sessions, and compliance', href: '/settings/security' },
+      { name: 'Branding', desc: 'Customize logo, colors, and theme', href: '/settings/branding' },
+    ]},
+    { title: 'Developer', items: [
+      { name: 'API Keys', desc: 'Create and manage API access tokens', href: '/settings/api-keys' },
+      { name: 'Webhooks', desc: 'Configure event notification endpoints', href: '/settings/webhooks' },
+      { name: 'Rate Limits', desc: 'Monitor API usage and quotas', href: '/settings/rate-limits' },
+      { name: 'LLM Connections', desc: 'Manage AI model provider API keys', href: '/settings/llm-connections' },
+      { name: 'Env Variables', desc: 'Manage secrets and configuration', href: '/settings/env-vars' },
+    ]},
+    { title: 'Data & Compliance', items: [
+      { name: 'Audit Log', desc: 'Track all actions for compliance', href: '/settings/audit-log' },
+      { name: 'Export / Import', desc: 'Backup and restore configurations', href: '/settings/export' },
+    ]},
+  ];
   return (
-    <div className="max-w-[800px] mx-auto">
+    <div className="max-w-[900px] mx-auto">
       <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Settings</h1>
-      <p className="text-sm text-gray-500 mb-8">Manage your account and platform configuration</p>
-      <div className="space-y-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Account</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100"><span className="text-sm text-gray-500">Email</span><span className="text-sm text-gray-900">gopal@aabhyasa.com</span></div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100"><span className="text-sm text-gray-500">Plan</span><span className="text-sm font-semibold text-indigo-600">Pro</span></div>
-            <div className="flex justify-between items-center py-2"><span className="text-sm text-gray-500">Member since</span><span className="text-sm text-gray-900">April 2026</span></div>
+      <p className="text-sm text-gray-500 mb-8">Manage your account, integrations, and platform configuration</p>
+      <div className="space-y-8">
+        {sections.map(section => (
+          <div key={section.title}>
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{section.title}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {section.items.map(item => (
+                <Link key={item.href} href={item.href} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all group block">
+                  <div className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors mb-1">{item.name}</div>
+                  <div className="text-xs text-gray-400">{item.desc}</div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">API Configuration</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100"><span className="text-sm text-gray-500">Default Model</span><span className="text-sm font-mono text-gray-900">claude-sonnet-4</span></div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100"><span className="text-sm text-gray-500">Rate Limit</span><span className="text-sm text-gray-900">5,000 calls/day</span></div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100"><span className="text-sm text-gray-500">Token Limit</span><span className="text-sm text-gray-900">10M tokens/month</span></div>
-            <div className="flex justify-between items-center py-2"><span className="text-sm text-gray-500">Endpoint</span><span className="text-sm font-mono text-indigo-600">agentforcecrew.com/api</span></div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a href="/settings/api-keys" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all block group">
-            <div className="text-sm font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">API Keys</div>
-            <div className="text-xs text-gray-500">Create and manage keys for programmatic access</div>
-          </a>
-          <a href="/settings/webhooks" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all block group">
-            <div className="text-sm font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">Webhooks</div>
-            <div className="text-xs text-gray-500">Configure real-time event notifications</div>
-          </a>
-          <a href="/settings/llm-connections" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all block group">
-            <div className="text-sm font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">LLM Connections</div>
-            <div className="text-xs text-gray-500">Manage AI model provider API keys</div>
-          </a>
-          <a href="/settings/team" className="bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all block group">
-            <div className="text-sm font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">Team</div>
-            <div className="text-xs text-gray-500">Manage team members and permissions</div>
-          </a>
-        </div>
-        <div className="bg-white border border-red-100 rounded-xl p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Danger Zone</h3>
-          <div className="flex items-center justify-between">
-            <div><div className="text-sm font-medium text-gray-900">Delete Account</div><div className="text-xs text-gray-500 mt-0.5">Permanently delete your account and all data</div></div>
-            <button className="px-4 py-2 rounded-lg border border-red-200 text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors">Delete</button>
-          </div>
+        ))}
+      </div>
+      <div className="mt-8 bg-white border border-red-100 rounded-xl p-6 shadow-sm">
+        <h3 className="text-base font-semibold text-red-600 mb-2">Danger Zone</h3>
+        <div className="flex items-center justify-between">
+          <div><div className="text-sm font-medium text-gray-900">Delete Account</div><div className="text-xs text-gray-400 mt-0.5">Permanently delete your account and all data</div></div>
+          <button className="px-4 py-2 rounded-lg border border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 transition-colors">Delete</button>
         </div>
       </div>
     </div>
