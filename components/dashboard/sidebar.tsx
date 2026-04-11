@@ -32,23 +32,23 @@ const sections = [
 export function Sidebar() {
   const pathname = usePathname();
   return (
-    <aside className="w-56 h-full bg-[#0c0c14] border-r border-[#1e1e2e] flex flex-col">
-      <div className="px-5 py-4 border-b border-[#1e1e2e]">
+    <aside className="w-56 h-full bg-white border-r border-gray-200 flex flex-col">
+      <div className="px-5 py-4 border-b border-gray-100">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#6366f1] flex items-center justify-center text-white text-xs font-bold">N</div>
-          <span className="text-sm font-bold tracking-tight">Nexus</span>
+          <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">N</div>
+          <span className="text-sm font-bold tracking-tight text-gray-900">Nexus</span>
         </Link>
       </div>
       <nav className="flex-1 px-3 py-2 overflow-y-auto">
         {sections.map((section) => (
           <div key={section.title} className="mb-3">
-            <div className="px-3 py-1.5 text-[9px] font-bold text-[#3a3a4a] uppercase tracking-[0.15em]">{section.title}</div>
+            <div className="px-3 py-1.5 text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">{section.title}</div>
             <div className="space-y-0.5">
               {section.items.map((item) => {
                 const active = pathname === item.href || (pathname || '').startsWith(item.href + '/');
                 return (
                   <Link key={item.href} href={item.href}
-                    className={`flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] transition-colors ${active ? 'bg-[#6366f1]/10 text-[#818cf8] font-semibold' : 'text-[#6b6b8a] hover:text-white hover:bg-[#14141f]'}`}>
+                    className={`flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] transition-colors ${active ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}`}>
                     <span className="text-sm">{item.icon}</span>
                     {item.name}
                   </Link>
@@ -58,7 +58,7 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
-      <div className="px-4 py-3 border-t border-[#1e1e2e] text-[10px] text-[#4a4a5a]">Nexus v2.2.0</div>
+      <div className="px-4 py-3 border-t border-gray-100 text-[10px] text-gray-400">Nexus v2.2.0</div>
     </aside>
   );
 }
