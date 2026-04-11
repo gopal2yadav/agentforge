@@ -1,40 +1,41 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { LayoutDashboard, Bot, GitBranch, Brain, Activity, Settings, CreditCard, Sparkles } from 'lucide-react';
 
-const NAV = [
-  { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
-  { href: '/agents', icon: Bot, label: 'Agents' },
-  { href: '/flows', icon: GitBranch, label: 'Flows' },
-    { href: '/playground', label: 'Playground', icon: Zap },
-  { href: '/memory', icon: Brain, label: 'Memory' },
-  { href: '/monitoring', icon: Activity, label: 'Monitoring' },
-  { href: '/billing', icon: CreditCard, label: 'Billing' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
+const nav = [
+  { name: 'Dashboard', href: '/dashboard', icon: '⌂' },
+  { name: 'Agents', href: '/agents', icon: '⚙' },
+  { name: 'Flows', href: '/flows', icon: '↔' },
+  { name: 'Memory', href: '/memory', icon: '☁' },
+  { name: 'Playground', href: '/playground', icon: '▶' },
+  { name: 'Billing', href: '/billing', icon: '★' },
+  { name: 'Settings', href: '/settings', icon: '☸' },
 ];
 
 export function Sidebar() {
-  const p = usePathname();
+  const pathname = usePathname();
   return (
-    <aside className="w-[220px] bg-nexus-800/30 border-r border-nexus-700/30 flex flex-col shrink-0">
-      <div className="h-14 flex items-center px-5 border-b border-nexus-700/30">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-electric to-plasma flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white"/>
-          </div>
-          <span className="font-display font-bold text-[15px]">Nexus</span>
+    <aside className="w-56 h-full bg-[#0c0c14] border-r border-[#1e1e2e] flex flex-col">
+      <div className="p-4 border-b border-[#1e1e2e]">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-[#6366f1] flex items-center justify-center text-white text-xs font-bold">N</div>
+          <span className="text-sm font-bold tracking-tight">Nexus</span>
         </Link>
       </div>
-      <nav className="flex-1 py-3 px-3 space-y-0.5">
-        {NAV.map(item=>{const act=p===item.href||p.startsWith(item.href+'/');return <Link key={item.href} href={item.href} className={cn('flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium',act?'bg-electric/10 text-electric':'text-nexus-400 hover:bg-nexus-700/30')}><item.icon className="w-[18px] h-[18px]"/>{item.label}</Link>;})}
+      <nav className="flex-1 p-3 space-y-0.5">
+        {nav.map((item) => {
+          const active = pathname === item.href || pathname?.startsWith(item.href + '/');
+          return (
+            <Link key={item.href} href={item.href}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-colors ${active ? 'bg-[#6366f1]/15 text-white font-medium' : 'text-[#6b6b8a] hover:text-white hover:bg-[#1a1a2e]'}`}>
+              <span className="text-base">{item.icon}</span>
+              {item.name}
+            </Link>
+          );
+        })}
       </nav>
-      <div className="p-3 border-t border-nexus-700/30">
-        <div className="rounded-xl bg-gradient-to-br from-electric/5 to-plasma/5 border border-electric/10 p-3">
-          <div className="flex items-center gap-2 mb-2"><div className="w-2 h-2 rounded-full bg-pulse animate-pulse"/><span className="text-[11px] font-semibold text-nexus-300 uppercase">Swarm Active</span></div>
-          <div className="text-[11px] text-nexus-400">6 agents Â· 0 issues</div>
-        </div>
+      <div className="p-3 border-t border-[#1e1e2e]">
+        <div className="px-3 py-2 text-[10px] text-[#4a4a5a]">Nexus v2.1.0</div>
       </div>
     </aside>
   );
