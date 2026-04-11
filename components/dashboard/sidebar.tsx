@@ -8,6 +8,7 @@ const NAV = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
   { href: '/agents', icon: Bot, label: 'Agents' },
   { href: '/flows', icon: GitBranch, label: 'Flows' },
+    { href: '/playground', label: 'Playground', icon: Zap },
   { href: '/memory', icon: Brain, label: 'Memory' },
   { href: '/monitoring', icon: Activity, label: 'Monitoring' },
   { href: '/billing', icon: CreditCard, label: 'Billing' },
@@ -32,7 +33,7 @@ export function Sidebar() {
       <div className="p-3 border-t border-nexus-700/30">
         <div className="rounded-xl bg-gradient-to-br from-electric/5 to-plasma/5 border border-electric/10 p-3">
           <div className="flex items-center gap-2 mb-2"><div className="w-2 h-2 rounded-full bg-pulse animate-pulse"/><span className="text-[11px] font-semibold text-nexus-300 uppercase">Swarm Active</span></div>
-          <div className="text-[11px] text-nexus-400">6 agents · 0 issues</div>
+          <div className="text-[11px] text-nexus-400">6 agents Â· 0 issues</div>
         </div>
       </div>
     </aside>
