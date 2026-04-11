@@ -29,7 +29,7 @@ export function Hero() {
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#6366f1] via-[#22d3ee] to-[#ec4899]">That Think Together</span>
           </h1>
           <p className="text-lg text-[#6b6b8a] max-w-2xl mx-auto mb-10 leading-relaxed">
-            Build, deploy, and manage autonomous AI agent swarms. Visual workflow builder, persistent memory, and real-time monitoring — all in one platform.
+            Build, deploy, and manage autonomous AI agent swarms. Visual workflow builder, persistent memory, and real-time monitoring â all in one platform.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link href="/sign-up" className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-[#6366f1] text-white font-semibold hover:bg-[#5558e6] transition-all shadow-2xl shadow-[#6366f1]/25 text-base">
@@ -61,3 +61,7 @@ export function Hero() {
     </div>
   );
 }
+
+
+// Alias for backward compatibility
+export { Hero as HeroSection };
