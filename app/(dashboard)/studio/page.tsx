@@ -1,92 +1,134 @@
 'use client';
 import { useState } from 'react';
 
-const SUGGESTIONS = [
-  'Automate social media posting across platforms',
-  'Summarize customer support tickets daily',
-  'Generate weekly business reports from multiple data sources',
-  'Score and triage inbound sales leads',
-  'Review pull requests and suggest improvements',
-  'Monitor competitor pricing and alert on changes',
-];
-
-const PROJECTS = [
-  { id: '1', name: 'Lead Research Pipeline', status: 'live', modified: '2 hours ago', agents: 3, tasks: 5 },
-  { id: '2', name: 'Content Generation Crew', status: 'live', modified: '1 day ago', agents: 2, tasks: 4 },
-  { id: '3', name: 'Support Ticket Triage', status: 'deploying', modified: '30 min ago', agents: 4, tasks: 6 },
-  { id: '4', name: 'Code Review Bot', status: 'not_deployed', modified: '3 days ago', agents: 1, tasks: 3 },
-];
+const DEMO_CREW = {
+  name: 'Content Pipeline',
+  agents: [
+    { id: 'a1', name: 'Researcher', role: 'Research Analyst', model: 'claude-sonnet-4' },
+    { id: 'a2', name: 'Writer', role: 'Content Writer', model: 'claude-sonnet-4' },
+    { id: 'a3', name: 'Editor', role: 'Quality Editor', model: 'gpt-4o' },
+  ],
+  tasks: [
+    { id: 't1', name: 'Research Topic', agent: 'Researcher', output: 'Research report with sources' },
+    { id: 't2', name: 'Write Draft', agent: 'Writer', output: 'First draft of content' },
+    { id: 't3', name: 'Review & Polish', agent: 'Editor', output: 'Final polished content' },
+  ],
+};
 
 export default function StudioPage() {
-  const [prompt, setPrompt] = useState('');
-  const [filter, setFilter] = useState('all');
-  const [generating, setGenerating] = useState(false);
-
-  const statusStyle = (s) => {
-    if (s === 'live') return 'bg-green-400/10 text-green-400';
-    if (s === 'deploying') return 'bg-blue-400/10 text-blue-400';
-    if (s === 'failed') return 'bg-red-400/10 text-red-400';
-    return 'bg-gray-400/20 text-gray-400';
-  };
-
-  const filtered = PROJECTS.filter(p => filter === 'all' || p.status === filter);
-
-  const handleGenerate = () => {
-    if (!prompt.trim()) return;
-    setGenerating(true);
-    setTimeout(() => { setGenerating(false); setPrompt(''); }, 2000);
-  };
+  const [crew] = useState(DEMO_CREW);
+  const [activeTab, setActiveTab] = useState('agents');
 
   return (
-    <div className="max-w-[1000px] mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight mb-1">Crew Studio</h1>
-        <p className="text-sm text-[#6b6b8a]">Describe what you want to automate and AI will create intelligent workflows</p>
-      </div>
-      <div className="bg-[#14141f]/40 border border-[#2a2a3d] rounded-xl p-6 mb-8">
-        <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} rows={3}
-          placeholder="What automation would you like to build?"
-          className="w-full bg-[#0a0a0f] border border-[#2a2a3d] rounded-lg px-4 py-3 text-sm text-white placeholder-[#4a4a5a] focus:outline-none focus:border-[#6366f1] resize-none mb-3" />
-        <div className="flex items-center justify-between">
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTIONS.slice(0, 3).map(s => (
-              <button key={s} onClick={() => setPrompt(s)}
-                className="px-3 py-1 rounded-full text-[10px] border border-[#2a2a3d] text-[#6b6b8a] hover:text-white hover:border-[#6366f1] transition-colors truncate max-w-[200px]">
-                {s}
-              </button>
-            ))}
-          </div>
-          <button onClick={handleGenerate} disabled={generating || !prompt.trim()}
-            className="px-5 py-2.5 rounded-lg bg-[#6366f1] text-white text-sm font-semibold hover:bg-[#5558e6] transition-colors disabled:opacity-50 shadow-lg shadow-[#6366f1]/20">
-            {generating ? 'Generating...' : 'Build Crew'}
-          </button>
+    <div className="max-w-[1200px] mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Crew Studio</h1>
+          <p className="text-sm text-gray-500">Design and configure multi-agent crews visually</p>
+        </div>
+        <div className="flex gap-2">
+          <button className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-500 hover:text-gray-900">Import YAML</button>
+          <button className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">+ New Crew</button>
         </div>
       </div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-base font-semibold">Recent Projects</h2>
-        <div className="flex gap-2">
-          {['all', 'live', 'deploying', 'not_deployed'].map(f => (
-            <button key={f} onClick={() => setFilter(f)}
-              className={"px-3 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider " + (filter === f ? 'bg-[#6366f1]/15 text-[#818cf8]' : 'text-[#6b6b8a] hover:text-white')}>
-              {f === 'not_deployed' ? 'Draft' : f}
+
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm mb-6 p-5">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">C</div>
+          <div>
+            <div className="text-lg font-bold text-gray-900">{crew.name}</div>
+            <div className="text-xs text-gray-400">{crew.agents.length} agents \u00B7 {crew.tasks.length} tasks \u00B7 Sequential process</div>
+          </div>
+        </div>
+
+        <div className="flex gap-2 mb-4 border-b border-gray-100">
+          {['agents', 'tasks', 'config'].map(tab => (
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              className={"px-4 py-2 text-sm font-medium border-b-2 transition-colors " + (activeTab === tab ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-400 hover:text-gray-600')}>
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {filtered.map(p => (
-          <div key={p.id} className="bg-[#14141f]/40 border border-[#2a2a3d] rounded-xl p-5 hover:border-[#3a3a4d] transition-all group cursor-pointer">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-semibold group-hover:text-[#818cf8] transition-colors">{p.name}</div>
-              <span className={"px-2 py-0.5 rounded-full text-[9px] font-bold uppercase " + statusStyle(p.status)}>{p.status === 'not_deployed' ? 'draft' : p.status}</span>
-            </div>
-            <div className="flex items-center gap-4 text-[10px] text-[#6b6b8a]">
-              <span>{p.agents} agents</span>
-              <span>{p.tasks} tasks</span>
-              <span>Modified {p.modified}</span>
+
+        {activeTab === 'agents' && (
+          <div className="space-y-3">
+            {crew.agents.map((agent, i) => (
+              <div key={agent.id} className="bg-gray-50 border border-gray-100 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold">{i + 1}</div>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">{agent.name}</div>
+                    <div className="text-[11px] text-gray-400">{agent.role} \u00B7 {agent.model}</div>
+                  </div>
+                </div>
+                <button className="text-xs text-gray-400 hover:text-indigo-600">Edit</button>
+              </div>
+            ))}
+            <button className="w-full py-3 border border-dashed border-gray-200 rounded-lg text-sm text-gray-400 hover:text-indigo-600 hover:border-indigo-300">+ Add Agent</button>
+          </div>
+        )}
+
+        {activeTab === 'tasks' && (
+          <div className="space-y-3">
+            {crew.tasks.map((task, i) => (
+              <div key={task.id} className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">Task {i + 1}</span>
+                    <span className="text-sm font-semibold text-gray-900">{task.name}</span>
+                  </div>
+                  <span className="text-[11px] text-gray-400">Agent: {task.agent}</span>
+                </div>
+                <div className="text-xs text-gray-500">Expected output: {task.output}</div>
+              </div>
+            ))}
+            <button className="w-full py-3 border border-dashed border-gray-200 rounded-lg text-sm text-gray-400 hover:text-indigo-600 hover:border-indigo-300">+ Add Task</button>
+          </div>
+        )}
+
+        {activeTab === 'config' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Process Type</label>
+                <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900">
+                  <option>Sequential</option><option>Hierarchical</option><option>Parallel</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Memory</label>
+                <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900">
+                  <option>Enabled</option><option>Disabled</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Max RPM</label>
+                <input type="number" defaultValue={10} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900" />
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 block">Verbose</label>
+                <select className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900">
+                  <option>True</option><option>False</option>
+                </select>
+              </div>
             </div>
           </div>
-        ))}
+        )}
+      </div>
+
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">Pipeline Preview</h3>
+        <div className="flex items-center gap-3">
+          {crew.tasks.map((task, i) => (
+            <div key={task.id} className="flex items-center gap-3">
+              <div className="bg-indigo-50 border border-indigo-100 rounded-lg px-4 py-3 text-center min-w-[140px]">
+                <div className="text-xs font-semibold text-indigo-700">{task.name}</div>
+                <div className="text-[10px] text-gray-400 mt-0.5">{task.agent}</div>
+              </div>
+              {i < crew.tasks.length - 1 && <span className="text-gray-300 text-lg">\u2192</span>}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
