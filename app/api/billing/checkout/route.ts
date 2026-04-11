@@ -1,46 +1,32 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { getOrCreateUser } from '@/lib/utils';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-});
-
-export async function POST() {
+export async function POST(req: Request) {
   try {
-    const user = await getOrCreateUser();
-
-    if (user.plan === 'PRO') {
-      return NextResponse.json({ error: 'Already on Pro plan' }, { status: 400 });
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const priceId = process.env.STRIPE_PRO_PRICE_ID;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://agentforcecrew.com';
+    
+    if (!stripeKey || stripeKey.includes('placeholder')) {
+      return NextResponse.json({ 
+        error: 'Stripe not configured. Please add your STRIPE_SECRET_KEY to Vercel environment variables.',
+        configUrl: 'https://dashboard.stripe.com/apikeys'
+      }, { status: 503 });
     }
 
-    let customerId = user.stripeCustomerId;
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.name || undefined,
-        metadata: { userId: user.id, clerkId: user.clerkId },
-      });
-      customerId = customer.id;
-      const { db } = await import('@/lib/db');
-      await db.user.update({
-        where: { id: user.id },
-        data: { stripeCustomerId: customerId },
-      });
-    }
+    const Stripe = (await import('stripe')).default;
+    const stripe = new Stripe(stripeKey, { apiVersion: '2024-04-10' as any });
 
     const session = await stripe.checkout.sessions.create({
-      customer: customerId,
       mode: 'subscription',
-      line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID!, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing?canceled=true`,
-      metadata: { userId: user.id },
-      subscription_data: { metadata: { userId: user.id } },
+      payment_method_types: ['card'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: appUrl + '/dashboard?upgraded=true',
+      cancel_url: appUrl + '/billing?cancelled=true',
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (error: any) {
+    console.error('[Billing] Checkout error:', error.message);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
