@@ -10,21 +10,31 @@ export default function AgentCreatePage() {
   const [goal, setGoal] = useState('');
   const [backstory, setBackstory] = useState('');
   const [model, setModel] = useState('claude-sonnet-4');
-  const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const [selectedTools, setSelectedTools] = useState([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const toggleTool = (t: string) => setSelectedTools(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
-  const handleCreate = () => {
-    if (!name.trim() || !role.trim()) return;
-    setSaving(true);
-    setTimeout(() => { setSaving(false); setSaved(true); setTimeout(() => router.push('/agents'), 2000); }, 1500);
+  const [error, setError] = useState('');
+  const toggleTool = (t) => setSelectedTools(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+  const handleCreate = async () => {
+    if (!name.trim() || !role.trim()) { setError('Name and Role are required'); return; }
+    setError(''); setSaving(true);
+    try {
+      const res = await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, role, goal, backstory, model, tools: selectedTools }),
+      });
+      const data = await res.json();
+      if (res.ok) { setSaved(true); setTimeout(() => router.push('/agents'), 2000); }
+      else { setError('Failed to create agent'); setSaving(false); }
+    } catch (e) { setError('Network error'); setSaving(false); }
   };
   if (saved) return (
     <div className="max-w-[700px] mx-auto text-center py-20">
       <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-2xl font-bold mx-auto mb-4">\u2713</div>
       <h2 className="text-xl font-bold text-gray-900 mb-2">Agent Created Successfully!</h2>
       <p className="text-sm text-gray-500 mb-1">{name} ({role})</p>
-      <p className="text-xs text-gray-400">Model: {model} &bull; {selectedTools.length} tools attached</p>
+      <p className="text-xs text-gray-400">Model: {model} &bull; {selectedTools.length} tools</p>
       <p className="text-xs text-gray-400 mt-4">Redirecting to agents list...</p>
     </div>
   );
@@ -32,6 +42,7 @@ export default function AgentCreatePage() {
     <div className="max-w-[700px] mx-auto">
       <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Create Agent</h1>
       <p className="text-sm text-gray-500 mb-6">Define a new AI agent with role, goal, and tools</p>
+      {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">{error}</div>}
       <div className="space-y-5">
         <div><label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Agent Name *</label><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Research Agent" className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500" /></div>
         <div><label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Role *</label><input type="text" value={role} onChange={e => setRole(e.target.value)} placeholder="e.g., Senior Research Analyst" className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500" /></div>
