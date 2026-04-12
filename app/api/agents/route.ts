@@ -35,9 +35,9 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    if (!id) return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
+    if (!id) return NextResponse.json({ error: 'Missing agent id' }, { status: 400 });
     await prisma.agent.delete({ where: { id } });
-    return NextResponse.json({ deleted: true, id });
+    return NextResponse.json({ deleted: true });
   } catch (e: any) {
     return NextResponse.json({ error: 'Failed to delete: ' + e.message }, { status: 500 });
   }
