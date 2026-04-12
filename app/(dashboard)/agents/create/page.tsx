@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+
 const TOOLS = ['web_search', 'document_reader', 'summarizer', 'code_analyzer', 'github_pr', 'linter', 'sql_query', 'csv_parser', 'chart_generator', 'email_sender', 'slack_notifier', 'calendar'];
 const MODELS = ['claude-sonnet-4', 'claude-opus-4', 'gpt-4o', 'gpt-4o-mini', 'llama-3.3-70b'];
+
 export default function AgentCreatePage() {
   const router = useRouter();
   const [name, setName] = useState('');
@@ -10,11 +12,13 @@ export default function AgentCreatePage() {
   const [goal, setGoal] = useState('');
   const [backstory, setBackstory] = useState('');
   const [model, setModel] = useState('claude-sonnet-4');
-  const [selectedTools, setSelectedTools] = useState([]);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
-  const toggleTool = (t) => setSelectedTools(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+
+  const toggleTool = (t: string) => setSelectedTools(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+
   const handleCreate = async () => {
     if (!name.trim() || !role.trim()) { setError('Name and Role are required'); return; }
     setError(''); setSaving(true);
@@ -24,20 +28,21 @@ export default function AgentCreatePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, role, goal, backstory, model, tools: selectedTools }),
       });
-      const data = await res.json();
       if (res.ok) { setSaved(true); setTimeout(() => router.push('/agents'), 2000); }
       else { setError('Failed to create agent'); setSaving(false); }
     } catch (e) { setError('Network error'); setSaving(false); }
   };
+
   if (saved) return (
     <div className="max-w-[700px] mx-auto text-center py-20">
-      <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-2xl font-bold mx-auto mb-4">\u2713</div>
+      <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-2xl font-bold mx-auto mb-4">OK</div>
       <h2 className="text-xl font-bold text-gray-900 mb-2">Agent Created Successfully!</h2>
       <p className="text-sm text-gray-500 mb-1">{name} ({role})</p>
-      <p className="text-xs text-gray-400">Model: {model} &bull; {selectedTools.length} tools</p>
+      <p className="text-xs text-gray-400">Model: {model} | {selectedTools.length} tools</p>
       <p className="text-xs text-gray-400 mt-4">Redirecting to agents list...</p>
     </div>
   );
+
   return (
     <div className="max-w-[700px] mx-auto">
       <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Create Agent</h1>
