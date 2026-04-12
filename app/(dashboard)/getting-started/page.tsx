@@ -1,40 +1,71 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-export default function OnboardingPage() {
-  const [completed, setCompleted] = useState([true, true, false, false, false, false]);
-  const toggle = (i) => { const n = [...completed]; n[i] = !n[i]; setCompleted(n); };
+
+export default function GettingStartedPage() {
+  const [health, setHealth] = useState<any>(null);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([fetch('/api/health').then(r => r.json()), fetch('/api/stats').then(r => r.json())])
+      .then(([h, s]) => { setHealth(h); setStats(s); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div className="text-center py-16"><div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>;
+
   const steps = [
-    { title: 'Create your account', desc: 'Sign up with Google SSO or email', link: '/sign-up', done: true },
-    { title: 'Connect an LLM provider', desc: 'Add your Anthropic, OpenAI, or other API key', link: '/settings/llm-connections', done: true },
-    { title: 'Create your first agent', desc: 'Define a role, goal, backstory, and tools', link: '/agents/create', done: false },
-    { title: 'Run a test in the Playground', desc: 'Test your agent with a sample prompt', link: '/playground', done: false },
-    { title: 'Build a multi-agent flow', desc: 'Chain agents together into a pipeline', link: '/flows/create', done: false },
-    { title: 'Set up monitoring', desc: 'Enable traces and error tracking', link: '/traces', done: false },
+    { title: 'Create your first agent', desc: 'Define an AI agent with a role, goal, and tools', done: (stats?.agents || 0) > 0, href: '/agents/create', count: stats?.agents },
+    { title: 'Build a workflow', desc: 'Chain agents together in a multi-step flow', done: (stats?.flows || 0) > 0, href: '/flows/create', count: stats?.flows },
+    { title: 'Deploy a swarm', desc: 'Launch a team of specialized agents', done: (stats?.crews || 0) > 0, href: '/builder', count: stats?.crews },
+    { title: 'Test in Playground', desc: 'Chat with your agents using real Claude AI', done: (stats?.totalRuns || 0) > 0, href: '/playground', count: stats?.totalRuns },
+    { title: 'Connect Anthropic AI', desc: 'Add your ANTHROPIC_API_KEY for real AI responses', done: health?.services?.ai?.status === 'configured', href: '/settings' },
+    { title: 'Connect Stripe', desc: 'Add STRIPE_SECRET_KEY for payment processing', done: health?.services?.payments?.status === 'configured', href: '/settings' },
+    { title: 'Try Code Sandbox', desc: 'Write and run code with AI assistance', done: false, href: '/sandbox' },
+    { title: 'Explore integrations', desc: 'Connect Slack, GitHub, Gmail, and more', done: false, href: '/integrations' },
   ];
-  const pct = Math.round((completed.filter(Boolean).length / steps.length) * 100);
+
+  const completedCount = steps.filter(s => s.done).length;
+  const progress = Math.round((completedCount / steps.length) * 100);
+
   return (
-    <div className="max-w-[700px] mx-auto">
-      <div className="mb-6"><h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Getting Started</h1><p className="text-sm text-gray-500">Complete these steps to set up your platform</p></div>
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-6">
+    <div className="max-w-[800px] mx-auto">
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Getting Started</h1>
+      <p className="text-sm text-indigo-300/50 mb-6">Complete these steps to set up your Nexus platform</p>
+
+      <div className="rounded-xl p-6 mb-6" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold text-gray-900">{completed.filter(Boolean).length} of {steps.length} completed</span>
-          <span className="text-sm font-bold text-indigo-600">{pct}%</span>
+          <span className="text-sm font-semibold">{completedCount} of {steps.length} complete</span>
+          <span className="text-sm font-bold" style={{ color: '#a5b4fc' }}>{progress}%</span>
         </div>
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden"><div className="h-full bg-indigo-500 rounded-full transition-all duration-500" style={{width: pct + '%'}} /></div>
+        <div className="w-full h-2 rounded-full" style={{ background: 'rgba(99,102,241,0.1)' }}>
+          <div className="h-full rounded-full transition-all duration-500" style={{ width: progress + '%', background: 'linear-gradient(90deg, #4f46e5, #7c3aed)' }} />
+        </div>
       </div>
-      <div className="space-y-2">
+
+      <div className="space-y-3">
         {steps.map((step, i) => (
-          <div key={i} className={'bg-white border rounded-xl p-4 flex items-center gap-4 transition-all ' + (completed[i] ? 'border-emerald-200 bg-emerald-50/30' : 'border-gray-200 hover:border-indigo-200')}>
-            <button onClick={() => toggle(i)} className={'w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ' + (completed[i] ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-gray-300 hover:border-indigo-500')}>
-              {completed[i] && <span className="text-xs">\u2713</span>}
-            </button>
-            <div className="flex-1 min-w-0">
-              <div className={'text-sm font-medium ' + (completed[i] ? 'text-gray-400 line-through' : 'text-gray-900')}>{step.title}</div>
-              <div className="text-xs text-gray-400 mt-0.5">{step.desc}</div>
+          <Link key={i} href={step.href} className="block rounded-xl p-5 transition-all hover:translate-y-[-1px]" style={{ background: step.done ? 'rgba(16,185,129,0.05)' : 'rgba(15,15,35,0.6)', border: '1px solid ' + (step.done ? 'rgba(16,185,129,0.2)' : 'rgba(99,102,241,0.15)') }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className={'w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ' + (step.done ? '' : '')} style={{ background: step.done ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,241,0.1)', color: step.done ? '#6ee7b7' : '#a5b4fc' }}>
+                  {step.done ? 'OK' : (i + 1)}
+                </div>
+                <div>
+                  <div className={'text-sm font-semibold ' + (step.done ? 'line-through opacity-60' : '')}>{step.title}</div>
+                  <div className="text-xs text-indigo-300/50">{step.desc}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {step.count !== undefined && <span className="text-xs font-mono text-indigo-400/40">{step.count}</span>}
+                {step.done ? (
+                  <span className="text-[10px] font-semibold" style={{ color: '#6ee7b7' }}>Done</span>
+                ) : (
+                  <span className="text-[10px] font-semibold text-indigo-400/50">Start</span>
+                )}
+              </div>
             </div>
-            {!completed[i] && <Link href={step.link} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium shrink-0">Start</Link>}
-          </div>
+          </Link>
         ))}
       </div>
     </div>
