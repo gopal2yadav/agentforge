@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
-import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Toaster } from 'sonner';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Nexus \u2014 AI Agent Orchestration Platform',
+  title: 'Nexus — AI Agent Orchestration Platform',
   description: 'Build, orchestrate, and deploy autonomous AI agents that collaborate to solve complex tasks.',
   icons: { icon: '/favicon.svg' },
 };
@@ -14,18 +13,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: '#4f46e5',
-          colorBackground: '#ffffff',
-          colorInputBackground: '#f9fafb',
-          colorInputText: '#111827',
-          borderRadius: '10px',
+          colorPrimary: '#6366f1',
+          colorBackground: '#0c0a1a',
+          colorInputBackground: '#0f0f23',
+          colorInputText: '#e0e7ff',
+          borderRadius: '12px',
         },
       }}
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      afterSignInUrl="/dashboard"
-      afterSignUpUrl="/dashboard"
     >
       <html lang="en">
         <head>
@@ -34,9 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
           <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,600,700&f[]=general-sans@400,500,600&display=swap" rel="stylesheet" />
         </head>
-        <body className="font-body bg-white text-gray-900">
+        <body style={{ background: '#020108', color: '#e0e7ff', fontFamily: "'Satoshi', 'General Sans', -apple-system, sans-serif" }}>
           {children}
-          <Toaster position="bottom-right" />
         </body>
       </html>
     </ClerkProvider>
