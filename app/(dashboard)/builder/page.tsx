@@ -1,76 +1,142 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-const SUGGESTIONS = [
-  { title: 'Automate social media posting', desc: 'Schedule and publish content across platforms' },
-  { title: 'Summarize support tickets', desc: 'Auto-categorize and summarize incoming tickets' },
-  { title: 'Generate weekly reports', desc: 'Collect data and create executive summaries' },
-  { title: 'Process invoices', desc: 'Extract data, validate, and route for approval' },
-  { title: 'Score inbound leads', desc: 'Rank leads by fit, engagement, and intent' },
-  { title: 'Triage GitHub issues', desc: 'Auto-label, assign, and prioritize new issues' },
-];
+import { useState, useEffect } from 'react';
+
+interface SwarmTemplate { name: string; agents: { name: string; role: string; goal: string; backstory: string; tools: string[] }[] }
+
 export default function BuilderPage() {
-  const router = useRouter();
-  const [prompt, setPrompt] = useState('');
-  const [building, setBuilding] = useState(false);
-  const [result, setResult] = useState<{name: string; agents: string[]; steps: string[]} | null>(null);
-  const handleBuild = () => {
-    if (!prompt.trim()) return;
-    setBuilding(true);
-    setResult(null);
-    setTimeout(() => {
-      setResult({
-        name: prompt.length > 30 ? prompt.substring(0, 30) + '...' : prompt,
-        agents: ['Research Agent', 'Writer Agent', 'Reviewer Agent'],
-        steps: [
-          '1. Research Agent gathers relevant data and context',
-          '2. Writer Agent drafts the output based on research',
-          '3. Reviewer Agent checks quality and provides feedback',
-          '4. Final output is compiled and delivered',
-        ],
+  const [swarms, setSwarms] = useState<SwarmTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deploying, setDeploying] = useState<string | null>(null);
+  const [deployed, setDeployed] = useState<string[]>([]);
+  const [stats, setStats] = useState<any>(null);
+  const [expandedSwarm, setExpandedSwarm] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/swarm').then(r => r.json()).then(d => { setSwarms(d); setLoading(false); }).catch(() => setLoading(false));
+    fetch('/api/stats').then(r => r.json()).then(setStats).catch(() => {});
+  }, []);
+
+  const deploySwarm = async (swarmName: string) => {
+    setDeploying(swarmName);
+    try {
+      const res = await fetch('/api/swarm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ swarmName })
       });
-      setBuilding(false);
-    }, 2500);
+      const data = await res.json();
+      if (data.swarm) {
+        setDeployed(prev => [...prev, swarmName]);
+        const statsRes = await fetch('/api/stats');
+        setStats(await statsRes.json());
+      }
+    } catch (e) {}
+    setDeploying(null);
   };
+
+  const categoryColors: Record<string, string> = {
+    'Research': 'bg-blue-50 text-blue-700 border-blue-200',
+    'Engineering': 'bg-gray-100 text-gray-800 border-gray-300',
+    'Marketing': 'bg-pink-50 text-pink-700 border-pink-200',
+    'Support': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    'Data': 'bg-violet-50 text-violet-700 border-violet-200',
+  };
+
+  const getCategory = (name: string) => {
+    if (name.includes('Research')) return 'Research';
+    if (name.includes('Dev')) return 'Engineering';
+    if (name.includes('Marketing')) return 'Marketing';
+    if (name.includes('Customer')) return 'Support';
+    if (name.includes('Data')) return 'Data';
+    return 'Research';
+  };
+
+  if (loading) return <div className="text-center py-16"><div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" /><p className="text-sm text-gray-400">Loading swarm templates...</p></div>;
+
   return (
-    <div className="max-w-[900px] mx-auto">
-      <div className="mb-6"><h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">AI Builder</h1><p className="text-sm text-gray-500">Describe what you want to automate and AI will design the workflow</p></div>
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-6">
-        <textarea value={prompt} onChange={e => setPrompt(e.target.value)} rows={3} placeholder="Describe what you want to automate..."
-          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-900 placeholder-gray-400 resize-none focus:outline-none focus:border-indigo-500 mb-4" />
-        <button onClick={handleBuild} disabled={building || !prompt.trim()}
-          className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 shadow-sm transition-all">
-          {building ? 'Building workflow...' : 'Build with AI'}
-        </button>
-      </div>
-      {building && (
-        <div className="bg-white border border-indigo-200 rounded-xl p-6 shadow-sm mb-6 animate-pulse">
-          <div className="flex items-center gap-3"><div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" /><span className="text-sm text-indigo-600 font-medium">AI is designing your workflow...</span></div>
-          <div className="mt-4 space-y-2"><div className="h-3 bg-indigo-50 rounded w-3/4" /><div className="h-3 bg-indigo-50 rounded w-1/2" /><div className="h-3 bg-indigo-50 rounded w-2/3" /></div>
+    <div className="max-w-[1200px] mx-auto">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">AI Builder</h1>
+          <p className="text-sm text-gray-500">Deploy intelligent agent swarms with one click</p>
         </div>
-      )}
-      {result && (
-        <div className="bg-white border border-emerald-200 rounded-xl p-6 shadow-sm mb-6">
-          <div className="flex items-center gap-2 mb-4"><div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs font-bold">\u2713</div><span className="text-sm font-semibold text-emerald-700">Workflow designed successfully!</span></div>
-          <h3 className="text-base font-semibold text-gray-900 mb-3">Recommended Pipeline</h3>
-          <div className="mb-4"><span className="text-xs text-gray-400">Agents needed:</span><div className="flex gap-2 mt-1">{result.agents.map(a => (<span key={a} className="px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-100">{a}</span>))}</div></div>
-          <div className="mb-4"><span className="text-xs text-gray-400">Execution steps:</span><div className="mt-1 space-y-1.5">{result.steps.map((s, i) => (<div key={i} className="text-sm text-gray-700">{s}</div>))}</div></div>
+        {stats && (
           <div className="flex gap-3">
-            <button onClick={() => router.push('/flows/create')} className="px-5 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">Create This Flow</button>
-            <button onClick={() => router.push('/agents/create')} className="px-5 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:text-gray-900">Create Agents First</button>
+            <div className="text-center px-4 py-2 bg-white border border-gray-200 rounded-lg"><div className="text-lg font-bold text-indigo-600">{stats.agents}</div><div className="text-[10px] text-gray-400">Agents</div></div>
+            <div className="text-center px-4 py-2 bg-white border border-gray-200 rounded-lg"><div className="text-lg font-bold text-emerald-600">{stats.crews}</div><div className="text-[10px] text-gray-400">Crews</div></div>
+            <div className="text-center px-4 py-2 bg-white border border-gray-200 rounded-lg"><div className="text-lg font-bold text-gray-900">{stats.totalRuns}</div><div className="text-[10px] text-gray-400">Runs</div></div>
           </div>
-        </div>
-      )}
-      {!result && !building && (
-        <div><h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quick Start Templates</h3>
-          <div className="grid grid-cols-2 gap-3">{SUGGESTIONS.map(s => (
-            <button key={s.title} onClick={() => { setPrompt(s.title + ': ' + s.desc); }} className="bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-indigo-200 hover:shadow-md transition-all">
-              <div className="text-sm font-semibold text-gray-900 mb-1">{s.title}</div>
-              <div className="text-xs text-gray-500">{s.desc}</div>
-            </button>
-          ))}</div>
-        </div>
-      )}
+        )}
+      </div>
+
+      <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6">
+        <p className="text-sm text-indigo-700">Each swarm deploys multiple specialized AI agents that work together as a crew. Agents are powered by <strong>Claude Sonnet 4</strong> and execute with real AI when you run them.</p>
+      </div>
+
+      <div className="space-y-4">
+        {swarms.map(swarm => {
+          const cat = getCategory(swarm.name);
+          const isDeployed = deployed.includes(swarm.name);
+          const isDeploying = deploying === swarm.name;
+          const isExpanded = expandedSwarm === swarm.name;
+
+          return (
+            <div key={swarm.name} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all overflow-hidden">
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-lg font-bold">{swarm.agents.length}</div>
+                    <div>
+                      <div className="text-[15px] font-semibold text-gray-900">{swarm.name}</div>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={'px-2 py-0.5 rounded text-[9px] font-semibold border ' + (categoryColors[cat] || '')}>{cat}</span>
+                        <span className="text-[11px] text-gray-400">{swarm.agents.length} agents</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setExpandedSwarm(isExpanded ? null : swarm.name)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:border-gray-300">{isExpanded ? 'Hide' : 'View'} Agents</button>
+                    {isDeployed ? (
+                      <span className="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-semibold border border-emerald-200">Deployed</span>
+                    ) : (
+                      <button onClick={() => deploySwarm(swarm.name)} disabled={isDeploying} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 disabled:opacity-50 shadow-sm">{isDeploying ? 'Deploying...' : 'Deploy Swarm'}</button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {swarm.agents.map(a => (
+                    <div key={a.name} className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 border border-gray-100">
+                      <div className="w-5 h-5 rounded bg-indigo-100 flex items-center justify-center text-indigo-600 text-[9px] font-bold">{a.name.charAt(0)}</div>
+                      <span className="text-[11px] text-gray-700 font-medium">{a.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {isExpanded && (
+                <div className="border-t border-gray-100 bg-gray-50 px-5 py-4">
+                  <div className="space-y-3">
+                    {swarm.agents.map(a => (
+                      <div key={a.name} className="bg-white rounded-lg border border-gray-200 p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <div className="text-sm font-semibold text-gray-900">{a.name}</div>
+                            <div className="text-xs text-gray-500">{a.role}</div>
+                          </div>
+                          <div className="flex gap-1">{a.tools.map(t => <span key={t} className="px-1.5 py-0.5 rounded text-[8px] font-mono bg-indigo-50 text-indigo-600">{t}</span>)}</div>
+                        </div>
+                        <p className="text-xs text-gray-600 mb-1"><strong>Goal:</strong> {a.goal}</p>
+                        <p className="text-xs text-gray-400"><strong>Background:</strong> {a.backstory}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
