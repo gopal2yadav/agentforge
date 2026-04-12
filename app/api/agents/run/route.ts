@@ -1,25 +1,39 @@
 import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return NextResponse.json({ error: 'AI not configured' }, { status: 503 });
+
   try {
-    const { agentId, prompt, model } = await req.json();
-    if (!prompt) return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+    const { agentId, prompt } = await request.json();
+    
+    // Find agent
+    let agent: any = null;
+    if (agentId) {
+      agent = await prisma.agent.findUnique({ where: { id: agentId } });
+    }
 
-    const responses: Record<string, string> = {
-      '1': '## Research Summary\n\n**Key Findings:**\n- The topic shows significant recent developments\n- Multiple authoritative sources confirm the trend\n- Expert consensus supports further investigation\n\n**Sources:** 12 papers, 5 reports\n\n*Completed in 1.85s | 3,200 tokens*',
-      '2': '## Code Review\n\n```diff\n+ Line 15: Consider using const instead of let\n+ Line 23: Missing error handling\n+ Line 47: Potential memory leak\n```\n\n**Score:** 7.5/10 | 3 suggestions\n\n*Completed in 2.1s | 2,800 tokens*',
-      '3': '## Data Analysis\n\n| Metric | Value | Change |\n|--------|-------|--------|\n| Records | 15,234 | +12.3% |\n| Avg Time | 245ms | -8.7% |\n| Errors | 0.3% | -15.2% |\n\n*Completed in 3.2s | 4,100 tokens*',
-    };
+    const systemPrompt = agent
+      ? 'You are ' + agent.name + ', a ' + agent.role + '. ' + (agent.goal ? 'Your goal: ' + agent.goal + '. ' : '') + (agent.backstory || '') + ' You have access to these tools: ' + (agent.tools || []).join(', ') + '. Respond helpfully and in character.'
+      : 'You are a helpful AI assistant on the Nexus platform.';
 
-    await new Promise(r => setTimeout(r, 800));
-
-    return NextResponse.json({
-      result: responses[agentId] || responses['1'],
-      agentId, model: model || 'claude-sonnet-4-20250514',
-      tokensUsed: Math.floor(Math.random() * 3000) + 1500,
-      latencyMs: Math.floor(Math.random() * 2000) + 800,
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1024, system: systemPrompt, messages: [{ role: 'user', content: prompt }] }),
     });
-  } catch (e) {
-    return NextResponse.json({ error: 'Failed to run agent' }, { status: 500 });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'No response';
+
+    // Increment run count
+    if (agent) {
+      await prisma.agent.update({ where: { id: agentId }, data: { runs: { increment: 1 } } });
+    }
+
+    return NextResponse.json({ reply, agent: agent?.name, model: data.model, usage: data.usage });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }

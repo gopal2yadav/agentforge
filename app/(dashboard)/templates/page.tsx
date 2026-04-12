@@ -1,41 +1,74 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
 const TEMPLATES = [
-  { id: 't1', name: 'Research Assistant', desc: 'Conducts web research, analyzes sources, and generates comprehensive reports', model: 'claude-sonnet-4', tools: ['web_search', 'summarizer', 'document_reader'], category: 'Research', popular: true },
-  { id: 't2', name: 'Code Reviewer', desc: 'Reviews pull requests, checks for bugs, security issues, and suggests improvements', model: 'claude-sonnet-4', tools: ['github_pr', 'code_analyzer', 'linter'], category: 'Engineering', popular: true },
-  { id: 't3', name: 'Content Writer', desc: 'Creates blog posts, social media content, and marketing copy', model: 'gpt-4o', tools: ['web_search', 'text_generator', 'seo_analyzer'], category: 'Marketing', popular: true },
-  { id: 't4', name: 'Data Analyst', desc: 'Processes CSV/SQL data, generates insights, and creates visualizations', model: 'claude-sonnet-4', tools: ['sql_query', 'csv_parser', 'chart_generator'], category: 'Data', popular: false },
-  { id: 't5', name: 'Customer Support', desc: 'Handles support tickets, answers FAQs, and escalates complex issues', model: 'gpt-4o-mini', tools: ['knowledge_base', 'ticket_manager', 'email_sender'], category: 'Support', popular: false },
-  { id: 't6', name: 'Email Drafter', desc: 'Composes professional emails, follow-ups, and outreach sequences', model: 'claude-sonnet-4', tools: ['email_sender', 'contact_lookup', 'calendar'], category: 'Productivity', popular: false },
-  { id: 't7', name: 'Meeting Summarizer', desc: 'Transcribes meetings, extracts action items, and sends follow-up notes', model: 'gpt-4o', tools: ['transcriber', 'summarizer', 'slack_notifier'], category: 'Productivity', popular: false },
-  { id: 't8', name: 'SEO Optimizer', desc: 'Analyzes pages for SEO, suggests improvements, and tracks rankings', model: 'gpt-4o-mini', tools: ['web_scraper', 'seo_analyzer', 'keyword_tracker'], category: 'Marketing', popular: false },
+  { id: '1', name: 'Research Assistant', role: 'Senior Research Analyst', goal: 'Find, analyze, and summarize information from multiple sources', backstory: 'Expert researcher with 10 years of experience in data analysis and report writing', tools: ['web_search', 'summarizer', 'document_reader'], category: 'Research' },
+  { id: '2', name: 'Code Reviewer', role: 'Principal Software Engineer', goal: 'Review code for bugs, security issues, and best practices', backstory: 'Staff engineer with deep expertise in code quality, security, and architecture', tools: ['code_analyzer', 'github_pr', 'linter'], category: 'Engineering' },
+  { id: '3', name: 'Content Writer', role: 'Senior Content Strategist', goal: 'Create engaging blog posts, articles, and marketing copy', backstory: 'Published author and content strategist with expertise in SEO and audience engagement', tools: ['web_search', 'document_reader', 'summarizer'], category: 'Marketing' },
+  { id: '4', name: 'Data Analyst', role: 'Lead Data Scientist', goal: 'Analyze datasets and generate actionable business insights', backstory: 'PhD in Statistics with 8 years of industry experience in ML and data visualization', tools: ['csv_parser', 'chart_generator', 'sql_query'], category: 'Analytics' },
+  { id: '5', name: 'Customer Support', role: 'Senior Support Specialist', goal: 'Resolve customer issues quickly and empathetically', backstory: 'Customer success expert with deep product knowledge and communication skills', tools: ['email_sender', 'slack_notifier', 'summarizer'], category: 'Support' },
+  { id: '6', name: 'DevOps Engineer', role: 'Senior DevOps Engineer', goal: 'Monitor, deploy, and optimize infrastructure', backstory: 'Cloud infrastructure expert with certifications in AWS, GCP, and Kubernetes', tools: ['code_analyzer', 'slack_notifier', 'calendar'], category: 'Engineering' },
+  { id: '7', name: 'Sales Assistant', role: 'Sales Development Rep', goal: 'Qualify leads and schedule meetings with prospects', backstory: 'Top-performing SDR with expertise in outbound sales and CRM management', tools: ['email_sender', 'calendar', 'web_search'], category: 'Sales' },
+  { id: '8', name: 'Project Manager', role: 'Senior Project Manager', goal: 'Coordinate tasks, track progress, and manage timelines', backstory: 'PMP certified with 12 years of experience managing cross-functional teams', tools: ['slack_notifier', 'calendar', 'email_sender'], category: 'Management' },
 ];
+
 export default function TemplatesPage() {
   const router = useRouter();
-  const [installing, setInstalling] = useState('');
+  const [installing, setInstalling] = useState<string | null>(null);
   const [installed, setInstalled] = useState<string[]>([]);
-  const handleUse = (t: typeof TEMPLATES[0]) => {
-    setInstalling(t.id);
-    setTimeout(() => { setInstalling(''); setInstalled(prev => [...prev, t.id]); setTimeout(() => router.push('/agents/create'), 1500); }, 1000);
+  const [filter, setFilter] = useState('All');
+  const categories = ['All', ...Array.from(new Set(TEMPLATES.map(t => t.category)))];
+
+  const handleInstall = async (template: typeof TEMPLATES[0]) => {
+    setInstalling(template.id);
+    try {
+      await fetch('/api/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: template.name, role: template.role, goal: template.goal, backstory: template.backstory, tools: template.tools }),
+      });
+      setInstalled(prev => [...prev, template.id]);
+      setTimeout(() => setInstalling(null), 500);
+    } catch (e) { setInstalling(null); }
   };
+
+  const filtered = filter === 'All' ? TEMPLATES : TEMPLATES.filter(t => t.category === filter);
+
   return (
-    <div className="max-w-[1200px] mx-auto">
-      <div className="mb-6"><h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Agent Templates</h1><p className="text-sm text-gray-500">Pre-built agents to get started quickly</p></div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {TEMPLATES.map(t => (
-          <div key={t.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all group relative">
-            {t.popular && <div className="absolute -top-2 right-4 px-2 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold uppercase rounded-full">Popular</div>}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 text-sm font-bold">{t.name.charAt(0)}</div>
-              <div><div className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">{t.name}</div><div className="text-[10px] text-gray-400">{t.category} &bull; {t.model}</div></div>
+    <div className="max-w-[1100px] mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Templates</h1>
+          <p className="text-sm text-gray-500">{TEMPLATES.length} pre-built agent templates</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-6">
+        {categories.map(c => (
+          <button key={c} onClick={() => setFilter(c)} className={'px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ' + (filter === c ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-500 hover:border-gray-300')}>{c}</button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        {filtered.map(t => (
+          <div key={t.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-indigo-200 transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <div className="text-[15px] font-semibold text-gray-900">{t.name}</div>
+                <div className="text-xs text-gray-500">{t.role}</div>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[9px] font-semibold bg-gray-100 text-gray-600">{t.category}</span>
             </div>
-            <p className="text-xs text-gray-500 mb-3 leading-relaxed">{t.desc}</p>
-            <div className="flex flex-wrap gap-1.5 mb-4">{t.tools.map(tool => (<span key={tool} className="px-2 py-0.5 rounded text-[9px] font-mono bg-gray-50 text-gray-500 border border-gray-100">{tool}</span>))}</div>
-            <button onClick={() => handleUse(t)} disabled={installing === t.id || installed.includes(t.id)}
-              className={'w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors border ' + (installed.includes(t.id) ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : installing === t.id ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : 'border-gray-200 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200')}>
-              {installed.includes(t.id) ? '\u2713 Installed — Opening creator...' : installing === t.id ? 'Installing...' : 'Use Template'}
-            </button>
+            <p className="text-xs text-gray-400 mb-3">{t.goal}</p>
+            <div className="flex flex-wrap gap-1 mb-4">
+              {t.tools.map(tool => <span key={tool} className="px-2 py-0.5 rounded text-[9px] font-mono bg-indigo-50 text-indigo-600">{tool}</span>)}
+            </div>
+            {installed.includes(t.id) ? (
+              <button disabled className="w-full px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-semibold">Installed</button>
+            ) : (
+              <button onClick={() => handleInstall(t)} disabled={installing === t.id} className="w-full px-3 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 disabled:opacity-50">{installing === t.id ? 'Installing...' : 'Use Template'}</button>
+            )}
           </div>
         ))}
       </div>
