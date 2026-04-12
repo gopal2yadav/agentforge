@@ -1,87 +1,57 @@
 'use client';
-import { useState } from 'react';
-
-const NOTIFICATIONS = [
-  { id: '1', type: 'success', title: 'Agent execution completed', body: 'Research Agent finished "Analyze Q1 market trends" — 3,200 tokens, 1.85s', time: '5 min ago', read: false },
-  { id: '2', type: 'info', title: 'New deployment live', body: 'v2.2.0 deployed to production successfully — 4 serverless functions', time: '20 min ago', read: false },
-  { id: '3', type: 'error', title: 'Agent execution failed', body: 'Data Analyst: Connection timeout — OpenAI API unreachable after 30s', time: '1 hour ago', read: false },
-  { id: '4', type: 'info', title: 'Team member joined', body: 'api@agentforcecrew.com was added as Admin to your workspace', time: '2 hours ago', read: true },
-  { id: '5', type: 'warning', title: 'Rate limit approaching', body: 'Code Reviewer agent is at 80% of daily API call limit (4,012 / 5,000)', time: '3 hours ago', read: true },
-  { id: '6', type: 'success', title: 'Flow pipeline completed', body: 'Content Pipeline: 4/4 agents executed — 8,400 total tokens used', time: '4 hours ago', read: true },
-  { id: '7', type: 'success', title: 'Webhook delivered', body: 'POST https://api.example.com/callback — 200 OK (120ms)', time: '4 hours ago', read: true },
-  { id: '8', type: 'info', title: 'Knowledge base synced', body: 'Sales Playbook updated: 312 chunks processed, 2.8MB indexed', time: '6 hours ago', read: true },
-];
+import { useState, useEffect } from 'react';
 
 export default function NotificationsPage() {
-  const [filter, setFilter] = useState('all');
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = notifications.filter(n => {
-    if (filter === 'unread') return !n.read;
-    return true;
-  });
+  useEffect(() => { fetch('/api/notifications').then(r => r.json()).then(d => { setData(d); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  if (loading) return <div className="text-center py-16"><div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>;
 
-  const typeStyle = (t: string) => {
-    if (t === 'success') return 'bg-emerald-50 text-emerald-600';
-    if (t === 'error') return 'bg-red-50 text-red-600';
-    if (t === 'warning') return 'bg-amber-50 text-amber-600';
-    return 'bg-blue-50 text-blue-600';
+  const typeStyles: Record<string, string> = {
+    success: 'border-emerald-500/30 bg-emerald-500/5',
+    info: 'border-indigo-500/30 bg-indigo-500/5',
+    warning: 'border-amber-500/30 bg-amber-500/5',
+    error: 'border-red-500/30 bg-red-500/5',
   };
-
-  const typeIcon = (t: string) => {
-    if (t === 'success') return '\u2713';
-    if (t === 'error') return '\u2717';
-    if (t === 'warning') return '\u26A0';
-    return '\u2139';
-  };
-
-  const markAllRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-  };
+  const dotStyles: Record<string, string> = { success: 'bg-emerald-400', info: 'bg-indigo-400', warning: 'bg-amber-400', error: 'bg-red-400' };
 
   return (
     <div className="max-w-[800px] mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Notifications</h1>
-          <p className="text-sm text-gray-500">{unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex gap-1">
-            {['all', 'unread'].map(f => (
-              <button key={f} onClick={() => setFilter(f)}
-                className={"px-3 py-1.5 rounded-lg text-[11px] font-semibold uppercase tracking-wider transition-colors " + (filter === f ? 'bg-indigo-50 text-indigo-700' : 'text-gray-400 hover:text-gray-900')}>
-                {f}{f === 'unread' && unreadCount > 0 ? ` (${unreadCount})` : ''}
-              </button>
-            ))}
-          </div>
-          {unreadCount > 0 && (
-            <button onClick={markAllRead} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Mark all read</button>
-          )}
+          <h1 className="text-2xl font-bold tracking-tight mb-1">Notifications</h1>
+          <p className="text-sm text-indigo-300/50">{data?.unread || 0} unread | {data?.notifications?.length || 0} total</p>
         </div>
       </div>
-
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        {filtered.length === 0 ? (
-          <div className="px-5 py-12 text-center text-gray-400 text-sm">No notifications to show</div>
-        ) : (
-          filtered.map((n, i) => (
-            <div key={n.id} className={"px-5 py-4 flex items-start gap-4 transition-colors " + (!n.read ? 'bg-indigo-50/30' : 'hover:bg-gray-50') + (i < filtered.length - 1 ? ' border-b border-gray-100' : '')}>
-              <div className={"w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 mt-0.5 " + typeStyle(n.type)}>{typeIcon(n.type)}</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className={"text-sm font-medium " + (!n.read ? 'text-gray-900' : 'text-gray-700')}>{n.title}</span>
-                  {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />}
+      <div className="space-y-3">
+        {(data?.notifications || []).map((n: any) => (
+          <div key={n.id} className={'rounded-xl p-5 border-l-4 transition-all ' + (typeStyles[n.type] || typeStyles.info)} style={{ background: 'rgba(15,15,35,0.6)', backdropFilter: 'blur(12px)' }}>
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3">
+                <div className={'w-2.5 h-2.5 rounded-full mt-1.5 ' + (dotStyles[n.type] || dotStyles.info)} />
+                <div>
+                  <div className="font-semibold text-sm">{n.title}</div>
+                  <p className="text-xs text-indigo-300/60 mt-1">{n.message}</p>
                 </div>
-                <div className="text-xs text-gray-500 mt-0.5">{n.body}</div>
               </div>
-              <div className="text-[11px] text-gray-400 shrink-0 mt-1">{n.time}</div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-indigo-400/40">{n.time}</span>
+                {!n.read && <div className="w-2 h-2 rounded-full bg-indigo-400" />}
+              </div>
             </div>
-          ))
-        )}
+          </div>
+        ))}
       </div>
+      {data?.total && (
+        <div className="mt-6 grid grid-cols-4 gap-3">
+          <div className="text-center p-3 rounded-lg" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}><div className="text-lg font-bold" style={{ color: '#a5b4fc' }}>{data.total.agents}</div><div className="text-[10px] text-indigo-300/40">Agents</div></div>
+          <div className="text-center p-3 rounded-lg" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}><div className="text-lg font-bold" style={{ color: '#6ee7b7' }}>{data.total.flows}</div><div className="text-[10px] text-indigo-300/40">Flows</div></div>
+          <div className="text-center p-3 rounded-lg" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}><div className="text-lg font-bold" style={{ color: '#fcd34d' }}>{data.total.crews}</div><div className="text-[10px] text-indigo-300/40">Crews</div></div>
+          <div className="text-center p-3 rounded-lg" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}><div className="text-lg font-bold" style={{ color: '#c4b5fd' }}>{data.total.automations}</div><div className="text-[10px] text-indigo-300/40">Automations</div></div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,87 +1,72 @@
 'use client';
-import { useState } from 'react';
-
-const MEMORIES = [
-  { id: 'm1', agent: 'Research Agent', key: 'market_trends_q1', content: 'EdTech market growing 34% YoY. Key drivers: AI tutoring (+52%), personalized learning, automated assessment. Top players: Coursera, Duolingo, Khan Academy.', importance: 0.92, tokens: 156, created: '15 min ago', type: 'long_term' },
-  { id: 'm2', agent: 'Research Agent', key: 'competitor_analysis', content: 'CrewAI: $18M ARR, 500+ enterprise customers. LangChain: Open-source, 70K GitHub stars. AutoGen: Microsoft-backed, strong multi-agent focus.', importance: 0.88, tokens: 134, created: '1 hour ago', type: 'long_term' },
-  { id: 'm3', agent: 'Writer Agent', key: 'blog_draft_healthcare', content: 'Draft: "AI in Healthcare 2026" — 2,400 words covering: diagnostic AI, drug discovery, patient monitoring. Key stat: 78% of hospitals now use AI-assisted diagnostics.', importance: 0.75, tokens: 245, created: '2 hours ago', type: 'working' },
-  { id: 'm4', agent: 'Code Reviewer', key: 'pr_142_review', content: 'PR #142 review: Auth middleware implementation. 3 suggestions: use const instead of let, add error boundary, clean up unused imports. Overall quality: B+.', importance: 0.65, tokens: 89, created: '3 hours ago', type: 'working' },
-  { id: 'm5', agent: 'Coordinator', key: 'team_context', content: 'Current sprint: Q2 planning. Active projects: Nexus v2.5 launch, API docs rewrite, Enterprise onboarding flow. Team capacity: 80%.', importance: 0.82, tokens: 78, created: '5 hours ago', type: 'long_term' },
-  { id: 'm6', agent: 'Data Analyst', key: 'revenue_summary', content: 'Q1 revenue: $142K (+23% QoQ). Top segment: Enterprise (62%). Churn rate: 3.2%. NRR: 118%. Pipeline: $890K weighted.', importance: 0.95, tokens: 67, created: '8 hours ago', type: 'long_term' },
-];
+import { useState, useEffect } from 'react';
 
 export default function MemoryPage() {
+  const [agents, setAgents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [search, setSearch] = useState('');
 
-  const filtered = MEMORIES.filter(m => {
-    if (typeFilter !== 'all' && m.type !== typeFilter) return false;
-    if (search && !m.key.includes(search.toLowerCase()) && !m.content.toLowerCase().includes(search.toLowerCase()) && !m.agent.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
+  useEffect(() => { fetch('/api/agents').then(r => r.json()).then(d => { setAgents(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
-  const totalTokens = MEMORIES.reduce((a, m) => a + m.tokens, 0);
-  const importanceColor = (v: number) => v >= 0.9 ? 'text-red-600 bg-red-50' : v >= 0.7 ? 'text-amber-600 bg-amber-50' : 'text-gray-500 bg-gray-50';
+  const agentsWithMemory = agents.filter(a => a.backstory || a.goal);
+
+  if (loading) return <div className="text-center py-16"><div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>;
 
   return (
     <div className="max-w-[1100px] mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Memory Explorer</h1>
-          <p className="text-sm text-gray-500">{MEMORIES.length} entries &bull; {totalTokens} tokens stored</p>
-        </div>
-        <button onClick={() => alert('Memory cleared! All working memory entries have been flushed.')} className="px-4 py-2 rounded-lg border border-red-200 text-sm text-red-500 hover:bg-red-50 transition-colors">Clear Working Memory</button>
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Memory</h1>
+      <p className="text-sm text-indigo-300/50 mb-6">Agent memory and knowledge — {agentsWithMemory.length} agents with stored context</p>
+
+      <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
+        <p className="text-sm text-indigo-300/70">Each agent stores persistent memory through its <strong className="text-indigo-300">backstory</strong> and <strong className="text-indigo-300">goal</strong>. This context is injected as a system prompt when the agent executes via the Anthropic Claude API, giving each agent a unique personality and expertise.</p>
       </div>
 
-      <div className="flex items-center gap-3 mb-4">
-        <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search memories by key, content, or agent..."
-          className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500" />
-        <div className="flex gap-1">
-          {['all', 'long_term', 'working'].map(t => (
-            <button key={t} onClick={() => setTypeFilter(t)}
-              className={'px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-colors ' + (typeFilter === t ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-900')}>
-              {t.replace('_', ' ')}
-            </button>
+      {agentsWithMemory.length === 0 ? (
+        <div className="text-center py-16 rounded-xl" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
+          <h3 className="text-lg font-semibold mb-1">No agent memories yet</h3>
+          <p className="text-sm text-indigo-300/50 mb-4">Create agents with backstories to build memory</p>
+          <a href="/agents/create" className="px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>Create Agent</a>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {agentsWithMemory.map(a => (
+            <div key={a.id} className="rounded-xl overflow-hidden transition-all" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
+              <button onClick={() => setExpanded(expanded === a.id ? null : a.id)} className="w-full p-5 flex items-center justify-between text-left">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold" style={{ background: 'rgba(99,102,241,0.15)', color: '#a5b4fc' }}>{a.name.charAt(0)}</div>
+                  <div>
+                    <div className="font-semibold text-sm">{a.name}</div>
+                    <div className="text-xs text-indigo-300/50">{a.role} | {a.model} | {a.runs || 0} runs</div>
+                  </div>
+                </div>
+                <span className="text-indigo-400/50 text-xs">{expanded === a.id ? 'Hide' : 'View'} Memory</span>
+              </button>
+              {expanded === a.id && (
+                <div className="px-5 pb-5 space-y-3" style={{ borderTop: '1px solid rgba(99,102,241,0.08)' }}>
+                  {a.goal && (
+                    <div className="p-3 rounded-lg" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                      <div className="text-[10px] font-semibold text-indigo-400/50 uppercase tracking-wider mb-1">Goal</div>
+                      <p className="text-sm text-indigo-200/80">{a.goal}</p>
+                    </div>
+                  )}
+                  {a.backstory && (
+                    <div className="p-3 rounded-lg" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                      <div className="text-[10px] font-semibold text-indigo-400/50 uppercase tracking-wider mb-1">Backstory / Persistent Memory</div>
+                      <p className="text-sm text-indigo-200/80">{a.backstory}</p>
+                    </div>
+                  )}
+                  {a.tools?.length > 0 && (
+                    <div className="p-3 rounded-lg" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                      <div className="text-[10px] font-semibold text-indigo-400/50 uppercase tracking-wider mb-1">Tools ({a.tools.length})</div>
+                      <div className="flex flex-wrap gap-1 mt-1">{a.tools.map((t: string) => <span key={t} className="px-2 py-0.5 rounded text-[9px] font-mono" style={{ background: 'rgba(99,102,241,0.1)', color: '#a5b4fc' }}>{t}</span>)}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           ))}
         </div>
-      </div>
-
-      <div className="space-y-2">
-        {filtered.map(m => (
-          <div key={m.id} onClick={() => setExpanded(expanded === m.id ? null : m.id)}
-            className={'bg-white border rounded-xl shadow-sm transition-all cursor-pointer ' + (expanded === m.id ? 'border-indigo-200 shadow-md' : 'border-gray-200 hover:border-indigo-200')}>
-            <div className="px-5 py-3.5 flex items-center justify-between">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-bold shrink-0">{m.agent.charAt(0)}</div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">{m.key}</span>
-                    <span className={'px-1.5 py-0.5 rounded text-[9px] font-semibold ' + (m.type === 'long_term' ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-100 text-gray-500')}>{m.type.replace('_', ' ')}</span>
-                  </div>
-                  <div className="text-[10px] text-gray-400">{m.agent} &bull; {m.created}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 shrink-0">
-                <span className="text-[10px] text-gray-400">{m.tokens} tok</span>
-                <span className={'px-2 py-0.5 rounded-full text-[9px] font-bold ' + importanceColor(m.importance)}>{(m.importance * 100).toFixed(0)}%</span>
-                <span className="text-gray-300 text-xs">{expanded === m.id ? '▲' : '▼'}</span>
-              </div>
-            </div>
-            {expanded === m.id && (
-              <div className="px-5 pb-4 border-t border-gray-100 pt-3">
-                <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-700 font-mono leading-relaxed border border-gray-100">{m.content}</div>
-                <div className="flex gap-2 mt-3">
-                  <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(m.content).catch(() => {}); alert('Copied to clipboard!'); }}
-                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold border border-gray-200 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Copy</button>
-                  <button onClick={(e) => { e.stopPropagation(); alert('Memory entry deleted.'); }}
-                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold border border-red-200 text-red-500 hover:bg-red-50 transition-colors">Delete</button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      )}
     </div>
   );
 }
