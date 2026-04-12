@@ -1,45 +1,34 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const AUTOMATIONS = [
-  { id: 'auto_1', name: 'New Slack Message → Research', trigger: 'Slack: #research-requests', agent: 'Research Agent', status: 'active', runs: 89, lastRun: '2 hours ago' },
-  { id: 'auto_2', name: 'GitHub PR → Code Review', trigger: 'GitHub: pull_request.opened', agent: 'Code Reviewer', status: 'active', runs: 142, lastRun: '30 min ago' },
-  { id: 'auto_3', name: 'Daily Report', trigger: 'Schedule: Every day at 9 AM', agent: 'Writer Agent', status: 'active', runs: 45, lastRun: '3 hours ago' },
-  { id: 'auto_4', name: 'New Lead → Qualification', trigger: 'Webhook: /api/webhooks/leads', agent: 'Coordinator', status: 'paused', runs: 23, lastRun: '2 days ago' },
-];
-
-const TRIGGERS = [
-  { value: 'slack', label: 'Slack Message', desc: 'Triggered by messages in a Slack channel' },
-  { value: 'github', label: 'GitHub Event', desc: 'Triggered by PR, issue, or push events' },
-  { value: 'schedule', label: 'Schedule (Cron)', desc: 'Run on a recurring schedule' },
-  { value: 'webhook', label: 'Webhook', desc: 'Triggered by incoming HTTP requests' },
-  { value: 'email', label: 'Email Received', desc: 'Triggered by incoming emails' },
-];
-
-const AGENTS = ['Research Agent', 'Writer Agent', 'Code Reviewer', 'Data Analyst', 'Coordinator'];
+const TRIGGERS = ['schedule', 'webhook', 'on_event', 'on_agent_complete', 'manual'];
 
 export default function AutomationsPage() {
+  const [automations, setAutomations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [name, setName] = useState('');
-  const [trigger, setTrigger] = useState('');
+  const [trigger, setTrigger] = useState('schedule');
   const [agent, setAgent] = useState('');
-  const [creating, setCreating] = useState(false);
-  const [created, setCreated] = useState(false);
+  const [agents, setAgents] = useState([]);
+  const [saving, setSaving] = useState(false);
 
-  const handleCreate = () => {
-    if (!name.trim() || !trigger || !agent) return;
-    setCreating(true);
-    setTimeout(() => {
-      setCreating(false);
-      setCreated(true);
-      setTimeout(() => {
-        setCreated(false);
-        setShowCreate(false);
-        setName('');
-        setTrigger('');
-        setAgent('');
-      }, 2000);
-    }, 1500);
+  useEffect(() => {
+    fetch('/api/automations').then(r => r.json()).then(d => { setAutomations(d); setLoading(false); }).catch(() => setLoading(false));
+    fetch('/api/agents').then(r => r.json()).then(setAgents).catch(() => {});
+  }, []);
+
+  const handleCreate = async () => {
+    if (!name.trim()) return;
+    setSaving(true);
+    const res = await fetch('/api/automations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, trigger, agent })
+    });
+    const data = await res.json();
+    setAutomations([data, ...automations]);
+    setShowCreate(false); setName(''); setSaving(false);
   };
 
   return (
@@ -47,87 +36,67 @@ export default function AutomationsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Automations</h1>
-          <p className="text-sm text-gray-500">{AUTOMATIONS.length} automations &bull; {AUTOMATIONS.filter(a => a.status === 'active').length} active</p>
+          <p className="text-sm text-gray-500">{automations.length} automations configured</p>
         </div>
-        <button onClick={() => setShowCreate(!showCreate)}
-          className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">
-          + Create Automation
-        </button>
+        <button onClick={() => setShowCreate(!showCreate)} className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">+ New Automation</button>
       </div>
 
       {showCreate && (
-        <div className="bg-white border border-indigo-200 rounded-xl p-6 shadow-sm mb-6">
-          {created ? (
-            <div className="flex items-center gap-2 text-sm text-emerald-600 font-medium">
-              <span className="text-lg">✓</span> Automation "{name || 'New Automation'}" created successfully!
+        <div className="bg-white border border-indigo-200 rounded-xl p-5 mb-6 shadow-sm">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Create Automation</h3>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">Name</label>
+              <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Daily Report" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" />
             </div>
-          ) : (
-            <>
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">New Automation</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Name</label>
-                  <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., New PR → Auto Review"
-                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500" />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Trigger</label>
-                  <div className="grid grid-cols-5 gap-2">
-                    {TRIGGERS.map(t => (
-                      <button key={t.value} onClick={() => setTrigger(t.value)}
-                        className={'px-3 py-2.5 rounded-lg text-left border transition-all ' + (trigger === t.value ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-500 hover:border-gray-300')}>
-                        <div className="text-xs font-semibold">{t.label}</div>
-                        <div className="text-[9px] mt-0.5 opacity-70">{t.desc}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 block">Agent</label>
-                  <select value={agent} onChange={e => setAgent(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-900">
-                    <option value="">Select an agent...</option>
-                    {AGENTS.map(a => <option key={a} value={a}>{a}</option>)}
-                  </select>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={handleCreate} disabled={creating || !name.trim() || !trigger || !agent}
-                    className="px-5 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 shadow-sm">
-                    {creating ? 'Creating...' : 'Create Automation'}
-                  </button>
-                  <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-500">Cancel</button>
-                </div>
-              </div>
-            </>
-          )}
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">Trigger</label>
+              <select value={trigger} onChange={e => setTrigger(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                {TRIGGERS.map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">Agent</label>
+              <select value={agent} onChange={e => setAgent(e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                <option value="">Select agent...</option>
+                {agents.map((a: any) => <option key={a.id} value={a.name}>{a.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handleCreate} disabled={saving || !name.trim()} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50">{saving ? 'Creating...' : 'Create'}</button>
+            <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-500">Cancel</button>
+          </div>
         </div>
       )}
 
-      <div className="space-y-3">
-        {AUTOMATIONS.map(a => (
-          <div key={a.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-indigo-200 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <div className={'w-2 h-2 rounded-full ' + (a.status === 'active' ? 'bg-emerald-500' : 'bg-gray-400')} />
-                <span className="text-[15px] font-semibold text-gray-900">{a.name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => alert(a.status === 'active' ? 'Automation paused.' : 'Automation activated.')}
-                  className="px-3 py-1 rounded-lg text-[11px] font-semibold border border-gray-200 text-gray-500 hover:text-gray-900 transition-colors">
-                  {a.status === 'active' ? 'Pause' : 'Activate'}
-                </button>
+      {loading ? (
+        <div className="text-center py-12"><div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" /><p className="text-sm text-gray-400">Loading...</p></div>
+      ) : automations.length === 0 ? (
+        <div className="text-center py-16 bg-white border border-gray-200 rounded-xl">
+          <div className="text-4xl mb-3">\u26A1</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">No automations yet</h3>
+          <p className="text-sm text-gray-500 mb-4">Automate your agent workflows with triggers</p>
+          <button onClick={() => setShowCreate(true)} className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700">Create Automation</button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {automations.map((a: any) => (
+            <div key={a.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-indigo-200 transition-all">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 text-sm">\u26A1</div>
+                  <div>
+                    <div className="text-[15px] font-semibold text-gray-900">{a.name}</div>
+                    <div className="text-xs text-gray-500">Trigger: {a.trigger} {a.agent ? '\u2192 ' + a.agent : ''}</div>
+                  </div>
+                </div>
                 <span className={'px-2.5 py-1 rounded-full text-[10px] font-semibold ' + (a.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500')}>{a.status}</span>
               </div>
             </div>
-            <div className="flex items-center gap-6 text-xs text-gray-400">
-              <span>Trigger: <span className="text-gray-600">{a.trigger}</span></span>
-              <span>Agent: <span className="text-indigo-600 font-medium">{a.agent}</span></span>
-              <span>{a.runs} runs</span>
-              <span>Last: {a.lastRun}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
