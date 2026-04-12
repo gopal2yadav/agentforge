@@ -2,23 +2,233 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #111827;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --card: #f9fafb;
-  --accent: #4f46e5;
-  --accent-light: #eef2ff;
+/* COSMIC UNIVERSE THEME — Live animated space background */
+
+/* Animated stars keyframes */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
+@keyframes float-up {
+  0% { transform: translateY(0) scale(1); opacity: 0.6; }
+  100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
+}
+
+@keyframes nebula-drift {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -20px) rotate(120deg); }
+  66% { transform: translate(-20px, 30px) rotate(240deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.3), 0 0 80px rgba(139, 92, 246, 0.1); }
+}
+
+@keyframes aurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes shooting-star {
+  0% { transform: translateX(-100px) translateY(100px) rotate(-45deg); opacity: 0; }
+  5% { opacity: 1; }
+  15% { opacity: 0; }
+  100% { transform: translateX(1500px) translateY(-1500px) rotate(-45deg); opacity: 0; }
+}
+
+/* Universe background base */
+.cosmic-bg {
+  background: radial-gradient(ellipse at 20% 50%, #0c0a1a 0%, #070515 40%, #020108 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.cosmic-bg::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(200,200,255,0.7), transparent),
+    radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 200px 60px, rgba(180,180,255,0.6), transparent),
+    radial-gradient(2px 2px at 250px 20px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 300px 90px, rgba(255,255,255,0.4), transparent),
+    radial-gradient(2px 2px at 350px 50px, rgba(200,200,255,0.7), transparent),
+    radial-gradient(1px 1px at 400px 70px, rgba(255,255,255,0.5), transparent);
+  background-size: 400px 100px;
+  animation: twinkle 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cosmic-bg::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(600px 600px at 10% 20%, rgba(99, 102, 241, 0.08), transparent),
+    radial-gradient(800px 800px at 80% 60%, rgba(139, 92, 246, 0.06), transparent),
+    radial-gradient(400px 400px at 50% 80%, rgba(59, 130, 246, 0.05), transparent),
+    radial-gradient(500px 500px at 90% 10%, rgba(168, 85, 247, 0.04), transparent);
+  animation: nebula-drift 60s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glass morphism cards */
+.glass-card {
+  background: rgba(15, 15, 35, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.1), 0 8px 32px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Glowing text */
+.glow-text {
+  color: #e0e7ff;
+  text-shadow: 0 0 10px rgba(99, 102, 241, 0.5), 0 0 40px rgba(99, 102, 241, 0.2);
+}
+
+/* Cosmic sidebar */
+.cosmic-sidebar {
+  background: rgba(8, 5, 25, 0.85);
+  backdrop-filter: blur(30px);
+  border-right: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+/* Cosmic input */
+.cosmic-input {
+  background: rgba(15, 15, 35, 0.5);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: #e0e7ff;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+.cosmic-input:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+  outline: none;
+}
+.cosmic-input::placeholder { color: rgba(148, 163, 184, 0.5); }
+
+/* Cosmic button */
+.cosmic-btn {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.cosmic-btn:hover {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.4), 0 0 60px rgba(139, 92, 246, 0.2);
+  transform: translateY(-1px);
+}
+.cosmic-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  transition: all 0.5s;
+}
+.cosmic-btn:hover::after { left: 100%; }
+
+/* Status badges */
+.cosmic-badge-green { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+.cosmic-badge-blue { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+.cosmic-badge-purple { background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+.cosmic-badge-amber { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+/* Scrollbar cosmic style */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(15, 15, 35, 0.3); }
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.5); }
+
+
+/* Override base body */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'General Sans', 'Satoshi', system-ui, -apple-system, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  background: #020108;
+  color: #e0e7ff;
+  font-family: 'Satoshi', 'General Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.font-body { font-family: 'General Sans', 'Satoshi', system-ui, sans-serif; }
-.font-display { font-family: 'Clash Display', system-ui, sans-serif; }
-.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+/* Override all white backgrounds to cosmic */
+.bg-white { background: rgba(15, 15, 35, 0.6) !important; backdrop-filter: blur(16px); }
+.bg-gray-50 { background: rgba(15, 15, 35, 0.3) !important; }
+.bg-gray-100 { background: rgba(20, 20, 45, 0.4) !important; }
+
+/* Override borders */
+.border-gray-200 { border-color: rgba(99, 102, 241, 0.15) !important; }
+.border-gray-100 { border-color: rgba(99, 102, 241, 0.08) !important; }
+.border-gray-50 { border-color: rgba(99, 102, 241, 0.05) !important; }
+
+/* Override text colors for dark theme */
+.text-gray-900 { color: #e0e7ff !important; }
+.text-gray-800 { color: #c7d2fe !important; }
+.text-gray-700 { color: #a5b4fc !important; }
+.text-gray-600 { color: #93a3bf !important; }
+.text-gray-500 { color: #7c8db5 !important; }
+.text-gray-400 { color: #64748b !important; }
+
+/* Override indigo colors to glow */
+.bg-indigo-600 { background: linear-gradient(135deg, #4f46e5, #7c3aed) !important; }
+.bg-indigo-50 { background: rgba(99, 102, 241, 0.1) !important; }
+.text-indigo-600 { color: #a5b4fc !important; }
+
+/* Override emerald for cosmic green */
+.bg-emerald-50 { background: rgba(16, 185, 129, 0.1) !important; }
+.text-emerald-600 { color: #6ee7b7 !important; }
+.bg-emerald-500 { background: #10b981 !important; }
+
+/* Override hover states */
+.hover\:border-indigo-200:hover { border-color: rgba(99, 102, 241, 0.4) !important; }
+.hover\:shadow-md:hover { box-shadow: 0 0 30px rgba(99, 102, 241, 0.1), 0 8px 32px rgba(0, 0, 0, 0.3) !important; }
+
+/* Focus states */
+.focus\:border-indigo-500:focus { border-color: rgba(99, 102, 241, 0.5) !important; box-shadow: 0 0 20px rgba(99, 102, 241, 0.15) !important; }
+
+/* Cards get glass effect */
+.rounded-xl { backdrop-filter: blur(12px); }
+.shadow-sm { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 0 0 1px rgba(99, 102, 241, 0.2) !important; }
+
+/* Input overrides */
+input, select, textarea {
+  background: rgba(15, 15, 35, 0.5) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+  color: #e0e7ff !important;
+}
+input::placeholder, textarea::placeholder { color: rgba(148, 163, 184, 0.4) !important; }
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(99, 102, 241, 0.5) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Animate buttons on hover */
+button { transition: all 0.3s ease !important; }
+button:hover { transform: translateY(-1px); }
+
+/* Animate page load */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+main > div { animation: fadeInUp 0.5s ease-out; }
