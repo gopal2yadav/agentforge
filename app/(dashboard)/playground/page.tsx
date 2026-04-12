@@ -1,12 +1,9 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 
-const MODELS = ['claude-sonnet-4', 'claude-opus-4', 'gpt-4o', 'gpt-4o-mini', 'llama-3.3-70b'];
+const MODELS = ['claude-sonnet-4', 'claude-opus-4', 'gpt-4o'];
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
+interface Message { role: 'user' | 'assistant'; content: string; }
 
 export default function PlaygroundPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -27,19 +24,19 @@ export default function PlaygroundPage() {
     setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
 
-    // Simulate AI response (will connect to real Anthropic API when ANTHROPIC_API_KEY is set)
-    setTimeout(() => {
+    try {
       const agent = agents.find(a => a.name === selectedAgent);
-      const agentContext = agent ? ' As ' + agent.role + ', ' : ' ';
-      const responses = [
-        'I\'ve analyzed your request.' + agentContext + 'Here\'s my approach:\n\n1. First, I\'ll break down the problem into components\n2. Then identify the key variables and constraints\n3. Finally, synthesize a comprehensive solution\n\nBased on my analysis, the most effective strategy would be to prioritize the core requirements while maintaining flexibility for edge cases. Would you like me to elaborate on any specific aspect?',
-        'Great question!' + agentContext + 'Let me think through this carefully.\n\nThe key insight here is that we need to balance efficiency with thoroughness. I recommend a phased approach:\n\n**Phase 1:** Data collection and initial analysis\n**Phase 2:** Pattern identification and hypothesis testing\n**Phase 3:** Solution implementation and validation\n\nShall I dive deeper into any of these phases?',
-        'I\'ve processed your input and here are my findings:' + agentContext + '\n\n- The primary factor is scalability - we need a solution that grows with your needs\n- Cost optimization should be considered from the start\n- Quality metrics should be established early\n\nI can provide more detailed recommendations if you share additional context about your specific use case.',
-      ];
-      const response = responses[Math.floor(Math.random() * responses.length)];
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
-      setLoading(false);
-    }, 1500 + Math.random() * 1000);
+      const res = await fetch('/api/playground', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg, model, agent: agent || null }),
+      });
+      const data = await res.json();
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply || data.error || 'No response' }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Error: Failed to connect to AI service.' }]);
+    }
+    setLoading(false);
   };
 
   return (
@@ -47,11 +44,11 @@ export default function PlaygroundPage() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Playground</h1>
-          <p className="text-sm text-gray-500">Test your agents interactively</p>
+          <p className="text-sm text-gray-500">Test your agents with real AI responses</p>
         </div>
         <div className="flex items-center gap-3">
           <select value={selectedAgent} onChange={e => setSelectedAgent(e.target.value)} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
-            <option value="">No agent (direct)</option>
+            <option value="">Nexus Assistant</option>
             {agents.map((a: any) => <option key={a.id} value={a.name}>{a.name}</option>)}
           </select>
           <select value={model} onChange={e => setModel(e.target.value)} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
@@ -63,9 +60,14 @@ export default function PlaygroundPage() {
       <div className="flex-1 bg-white border border-gray-200 rounded-xl overflow-y-auto p-4 mb-4">
         {messages.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl mx-auto mb-4">N</div>
+            <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl mx-auto mb-4 font-bold">N</div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Start a Conversation</h3>
-            <p className="text-sm text-gray-500 max-w-md mx-auto">Select an agent and model, then type a message to begin testing. {selectedAgent ? 'Using: ' + selectedAgent : 'No agent selected — using direct mode.'}</p>
+            <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">{selectedAgent ? 'Chatting with: ' + selectedAgent : 'Using Nexus Assistant. Select an agent above to chat as that agent.'}</p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {['What can you help me with?', 'Analyze my workflow', 'Generate a report outline'].map(q => (
+                <button key={q} onClick={() => { setInput(q); }} className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:border-indigo-300 hover:text-indigo-600">{q}</button>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -94,15 +96,7 @@ export default function PlaygroundPage() {
       </div>
 
       <div className="flex gap-3">
-        <input
-          type="text"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-          placeholder={selectedAgent ? 'Ask ' + selectedAgent + '...' : 'Type a message...'}
-          className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500"
-          disabled={loading}
-        />
+        <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()} placeholder={selectedAgent ? 'Ask ' + selectedAgent + '...' : 'Type a message...'} className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500" disabled={loading} />
         <button onClick={sendMessage} disabled={loading || !input.trim()} className="px-6 py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 shadow-sm">Send</button>
       </div>
     </div>
