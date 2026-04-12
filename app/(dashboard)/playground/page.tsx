@@ -1,8 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 
-const MODELS = ['claude-sonnet-4', 'claude-opus-4', 'gpt-4o'];
-
 interface Message { role: 'user' | 'assistant'; content: string; }
 
 export default function PlaygroundPage() {
@@ -12,6 +10,7 @@ export default function PlaygroundPage() {
   const [loading, setLoading] = useState(false);
   const [agents, setAgents] = useState<any[]>([]);
   const [selectedAgent, setSelectedAgent] = useState('');
+  const [tokenCount, setTokenCount] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { fetch('/api/agents').then(r => r.json()).then(setAgents).catch(() => {}); }, []);
@@ -19,41 +18,52 @@ export default function PlaygroundPage() {
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
-    const userMsg = input.trim();
+    const userMsg: Message = { role: 'user', content: input.trim() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
     setLoading(true);
 
     try {
-      const agent = agents.find(a => a.name === selectedAgent);
+      const agent = agents.find(a => a.name === selectedAgent) || null;
       const res = await fetch('/api/playground', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg, model, agent: agent || null }),
+        body: JSON.stringify({ messages: newMessages, model, agent }),
       });
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'assistant', content: data.reply || data.error || 'No response' }]);
+      if (data.reply) {
+        setMessages([...newMessages, { role: 'assistant', content: data.reply }]);
+        if (data.usage) setTokenCount(prev => prev + (data.usage.input_tokens || 0) + (data.usage.output_tokens || 0));
+      } else {
+        setMessages([...newMessages, { role: 'assistant', content: 'Error: ' + (data.error || 'No response from AI') }]);
+      }
     } catch (e) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Error: Failed to connect to AI service.' }]);
+      setMessages([...newMessages, { role: 'assistant', content: 'Network error. Check your connection.' }]);
     }
     setLoading(false);
   };
+
+  const clearChat = () => { setMessages([]); setTokenCount(0); };
 
   return (
     <div className="max-w-[900px] mx-auto flex flex-col h-[calc(100vh-120px)]">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Playground</h1>
-          <p className="text-sm text-gray-500">Test your agents with real AI responses</p>
+          <p className="text-sm text-gray-500">Real AI conversations powered by Anthropic Claude</p>
         </div>
         <div className="flex items-center gap-3">
+          {tokenCount > 0 && <span className="text-[10px] text-gray-400 font-mono">{tokenCount} tokens</span>}
           <select value={selectedAgent} onChange={e => setSelectedAgent(e.target.value)} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
-            <option value="">Nexus Assistant</option>
-            {agents.map((a: any) => <option key={a.id} value={a.name}>{a.name}</option>)}
+            <option value="">Nexus AI (direct)</option>
+            {agents.map((a: any) => <option key={a.id} value={a.name}>{a.name} ({a.role})</option>)}
           </select>
           <select value={model} onChange={e => setModel(e.target.value)} className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
-            {MODELS.map(m => <option key={m} value={m}>{m}</option>)}
+            <option value="claude-sonnet-4">Claude Sonnet 4</option>
+            <option value="claude-opus-4">Claude Opus 4</option>
           </select>
+          {messages.length > 0 && <button onClick={clearChat} className="px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-500 hover:text-red-500">Clear</button>}
         </div>
       </div>
 
@@ -61,11 +71,11 @@ export default function PlaygroundPage() {
         {messages.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 text-xl mx-auto mb-4 font-bold">N</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Start a Conversation</h3>
-            <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">{selectedAgent ? 'Chatting with: ' + selectedAgent : 'Using Nexus Assistant. Select an agent above to chat as that agent.'}</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{selectedAgent ? 'Chat with ' + selectedAgent : 'Nexus AI Playground'}</h3>
+            <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">Every response is generated by real Claude AI. Multi-turn conversations are fully supported — the AI remembers your entire conversation.</p>
             <div className="flex flex-wrap gap-2 justify-center">
-              {['What can you help me with?', 'Analyze my workflow', 'Generate a report outline'].map(q => (
-                <button key={q} onClick={() => { setInput(q); }} className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:border-indigo-300 hover:text-indigo-600">{q}</button>
+              {['Write a Python script to analyze CSV data', 'Draft a marketing strategy for a SaaS launch', 'Review this API design and suggest improvements'].map(q => (
+                <button key={q} onClick={() => setInput(q)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:border-indigo-300 hover:text-indigo-600 text-left">{q}</button>
               ))}
             </div>
           </div>
@@ -73,22 +83,14 @@ export default function PlaygroundPage() {
           <div className="space-y-4">
             {messages.map((msg, i) => (
               <div key={i} className={'flex ' + (msg.role === 'user' ? 'justify-end' : 'justify-start')}>
-                <div className={'max-w-[75%] rounded-xl px-4 py-3 text-sm ' + (msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-900 border border-gray-200')}>
-                  {msg.role === 'assistant' && selectedAgent && <div className="text-xs text-indigo-600 font-semibold mb-1">{selectedAgent}</div>}
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                <div className={'max-w-[80%] rounded-xl px-4 py-3 text-sm ' + (msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-gray-50 text-gray-900 border border-gray-200')}>
+                  {msg.role === 'assistant' && <div className="text-[10px] text-indigo-500 font-semibold mb-1">{selectedAgent || 'Nexus AI'} | {model}</div>}
+                  <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
                 </div>
               </div>
             ))}
             {loading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </div>
-              </div>
+              <div className="flex justify-start"><div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3"><div className="flex gap-1"><div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '0ms' }} /><div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '150ms' }} /><div className="w-2 h-2 rounded-full bg-indigo-400 animate-bounce" style={{ animationDelay: '300ms' }} /></div></div></div>
             )}
             <div ref={endRef} />
           </div>
@@ -97,7 +99,7 @@ export default function PlaygroundPage() {
 
       <div className="flex gap-3">
         <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()} placeholder={selectedAgent ? 'Ask ' + selectedAgent + '...' : 'Type a message...'} className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500" disabled={loading} />
-        <button onClick={sendMessage} disabled={loading || !input.trim()} className="px-6 py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 shadow-sm">Send</button>
+        <button onClick={sendMessage} disabled={loading || !input.trim()} className="px-6 py-3 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 shadow-sm">{loading ? '...' : 'Send'}</button>
       </div>
     </div>
   );

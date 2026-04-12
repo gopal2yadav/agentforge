@@ -2,36 +2,34 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: 'ANTHROPIC_API_KEY not configured' }, { status: 503 });
-  }
+  if (!apiKey) return NextResponse.json({ error: 'ANTHROPIC_API_KEY not configured. Add it in Vercel Environment Variables.' }, { status: 503 });
 
   try {
     const body = await request.json();
-    const { message, model, agent } = body;
+    const { messages, model, agent } = body;
 
+    // Build system prompt from agent if selected
     const systemPrompt = agent
-      ? 'You are ' + agent.name + ', a ' + agent.role + '. ' + (agent.goal ? 'Your goal: ' + agent.goal + '. ' : '') + (agent.backstory || '') + ' Respond helpfully and in character.'
-      : 'You are Nexus, an AI assistant for the Nexus AI Agent Orchestration Platform. Be helpful, concise, and professional.';
+      ? 'You are ' + agent.name + ', a ' + agent.role + '. ' + (agent.goal ? 'Your goal: ' + agent.goal + '. ' : '') + (agent.backstory || '') + ' You have access to tools: ' + (agent.tools || []).join(', ') + '. Stay in character and be helpful, specific, and actionable.'
+      : 'You are Nexus AI, the intelligent assistant powering the Nexus AI Agent Orchestration Platform at agentforcecrew.com. Help users with AI agents, workflows, automation, and any task they need. Be concise, practical, and expert-level.';
+
+    // Send full conversation history for multi-turn
+    const apiMessages = (messages || []).map((m: any) => ({ role: m.role, content: m.content }));
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
+        model: model === 'claude-opus-4' ? 'claude-opus-4-20250514' : 'claude-sonnet-4-20250514',
+        max_tokens: 2048,
         system: systemPrompt,
-        messages: [{ role: 'user', content: message }],
+        messages: apiMessages,
       }),
     });
 
     if (!res.ok) {
-      const err = await res.text();
-      return NextResponse.json({ error: 'Anthropic API error: ' + res.status, details: err }, { status: 502 });
+      const errText = await res.text();
+      return NextResponse.json({ error: 'AI API error (' + res.status + ')', details: errText }, { status: 502 });
     }
 
     const data = await res.json();
