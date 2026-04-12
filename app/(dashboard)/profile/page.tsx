@@ -1,6 +1,15 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+const ADMIN_LINKS = [
+  { label: 'Vercel Dashboard', href: 'https://vercel.com/gopal2yadavs-projects/agentforge' },
+  { label: 'GitHub Repo', href: 'https://github.com/gopal2yadav/agentforge' },
+  { label: 'Stripe', href: 'https://dashboard.stripe.com' },
+  { label: 'Clerk', href: 'https://dashboard.clerk.com' },
+  { label: 'Neon DB', href: 'https://console.neon.tech' },
+  { label: 'Anthropic', href: 'https://console.anthropic.com' },
+];
+
 export default function ProfilePage() {
   const [stats, setStats] = useState<any>(null);
   const [health, setHealth] = useState<any>(null);
@@ -48,8 +57,8 @@ export default function ProfilePage() {
         <div className="rounded-xl p-6" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
           <div className="text-sm font-semibold mb-4">Admin Links</div>
           <div className="grid grid-cols-2 gap-2">
-            {[['Vercel Dashboard','https://vercel.com/gopal2yadavs-projects/agentforge'],['GitHub Repo','https://github.com/gopal2yadav/agentforge'],['Stripe','https://dashboard.stripe.com'],['Clerk','https://dashboard.clerk.com'],['Neon DB','https://console.neon.tech'],['Anthropic','https://console.anthropic.com']].map(([l,h]) => (
-              <a key={l} href={h} target="_blank" rel="noopener" className="block p-3 rounded-lg text-sm text-indigo-200/70 hover:text-white transition-all" style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.1)' }}>{l}</a>
+            {ADMIN_LINKS.map(link => (
+              <a key={link.label} href={link.href} target="_blank" rel="noopener" className="block p-3 rounded-lg text-sm text-indigo-200/70 hover:text-white transition-all" style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.1)' }}>{link.label}</a>
             ))}
           </div>
         </div>
