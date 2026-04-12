@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Toaster } from 'sonner';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'Nexus \u2014 AI Agent Orchestration Platform',
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body className="font-body bg-white text-gray-900">
           {children}
           <Toaster position="bottom-right" />
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
