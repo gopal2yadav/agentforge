@@ -1,48 +1,52 @@
 'use client';
 import { useState } from 'react';
+
 const PROMPTS = [
-  { id: '1', title: 'Market Research Brief', category: 'Research', prompt: 'Analyze the current market landscape for [INDUSTRY]. Include market size, growth rate, key players, emerging trends, and potential opportunities. Format as an executive brief.', uses: 234, rating: 4.8 },
-  { id: '2', title: 'Code Review Checklist', category: 'Engineering', prompt: 'Review the following code for: 1) Security vulnerabilities 2) Performance issues 3) Best practices 4) Error handling 5) Code readability. Provide specific line-by-line feedback.', uses: 189, rating: 4.7 },
-  { id: '3', title: 'Blog Post Draft', category: 'Content', prompt: 'Write a 1500-word blog post about [TOPIC]. Include an engaging introduction, 3-4 key sections with subheadings, relevant examples, and a compelling conclusion with a call to action.', uses: 156, rating: 4.6 },
-  { id: '4', title: 'Customer Email Response', category: 'Support', prompt: 'Draft a professional, empathetic response to this customer complaint: [ISSUE]. Acknowledge their frustration, explain what happened, and offer a concrete resolution.', uses: 312, rating: 4.9 },
-  { id: '5', title: 'Data Analysis Report', category: 'Data', prompt: 'Analyze this dataset and provide: 1) Summary statistics 2) Key trends 3) Anomalies or outliers 4) Actionable recommendations 5) Visualization suggestions.', uses: 98, rating: 4.5 },
-  { id: '6', title: 'Competitor Analysis', category: 'Research', prompt: 'Compare [COMPANY] against its top 5 competitors across: pricing, features, market share, strengths, weaknesses, and strategic positioning. Present as a comparison matrix.', uses: 145, rating: 4.7 },
-  { id: '7', title: 'Sprint Planning Summary', category: 'Project', prompt: 'Summarize the following sprint planning notes into: 1) Sprint goals 2) User stories with estimates 3) Dependencies 4) Risks 5) Team capacity assessment.', uses: 87, rating: 4.4 },
-  { id: '8', title: 'SEO Content Brief', category: 'Marketing', prompt: 'Create an SEO content brief for the keyword [KEYWORD]. Include: target word count, H1/H2 structure, related keywords, search intent analysis, competitor content gaps, and recommended internal links.', uses: 201, rating: 4.8 },
+  { title: 'Market Research', category: 'Research', prompt: 'Conduct a comprehensive market analysis for [INDUSTRY]. Include market size, growth trends, key players, and opportunities.' },
+  { title: 'Code Review', category: 'Engineering', prompt: 'Review this code for bugs, security vulnerabilities, and performance issues. Suggest improvements with examples:\n\n[PASTE CODE HERE]' },
+  { title: 'Blog Post Draft', category: 'Content', prompt: 'Write a 1000-word blog post about [TOPIC]. Include an engaging introduction, 3-5 key sections with headers, and a compelling conclusion with a call to action.' },
+  { title: 'Email Campaign', category: 'Marketing', prompt: 'Create a 5-email drip campaign for [PRODUCT/SERVICE] targeting [AUDIENCE]. Include subject lines, preview text, and body copy for each email.' },
+  { title: 'Data Analysis', category: 'Analytics', prompt: 'Analyze this dataset and provide: 1) Key metrics and KPIs, 2) Trends and patterns, 3) Anomalies or outliers, 4) Actionable recommendations.\n\n[DESCRIBE YOUR DATA]' },
+  { title: 'Bug Report', category: 'Engineering', prompt: 'Create a detailed bug report for: [DESCRIBE BUG]. Include steps to reproduce, expected behavior, actual behavior, environment details, and severity assessment.' },
+  { title: 'Meeting Summary', category: 'Productivity', prompt: 'Summarize this meeting transcript into: 1) Key decisions made, 2) Action items with owners, 3) Open questions, 4) Next steps.\n\n[PASTE TRANSCRIPT]' },
+  { title: 'Product Requirements', category: 'Product', prompt: 'Create a PRD for [FEATURE]. Include: user stories, acceptance criteria, technical requirements, success metrics, and timeline estimate.' },
 ];
-const CATEGORIES = ['All', ...new Set(PROMPTS.map(p => p.category))];
-export default function PromptLibraryPage() {
-  const [cat, setCat] = useState('All');
-  const [search, setSearch] = useState('');
-  const [copied, setCopied] = useState('');
-  const filtered = PROMPTS.filter(p => (cat === 'All' || p.category === cat) && (!search || p.title.toLowerCase().includes(search.toLowerCase())));
-  const copy = (id, text) => { navigator.clipboard.writeText(text).catch(() => {}); setCopied(id); setTimeout(() => setCopied(''), 2000); };
+
+export default function PromptsPage() {
+  const [copied, setCopied] = useState<string | null>(null);
+  const [filter, setFilter] = useState('All');
+
+  const categories = ['All', ...Array.from(new Set(PROMPTS.map(p => p.category)))];
+  const filtered = filter === 'All' ? PROMPTS : PROMPTS.filter(p => p.category === filter);
+
+  const copyPrompt = (p: typeof PROMPTS[0]) => {
+    navigator.clipboard.writeText(p.prompt);
+    setCopied(p.title);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
   return (
     <div className="max-w-[1100px] mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div><h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Prompt Library</h1><p className="text-sm text-gray-500">Reusable prompt templates for your agents</p></div>
-        <button className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">+ Create Prompt</button>
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Prompt Library</h1>
+      <p className="text-sm text-indigo-300/50 mb-6">{PROMPTS.length} ready-to-use prompts — copy and use in the Playground</p>
+
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {categories.map(c => (
+          <button key={c} onClick={() => setFilter(c)} className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" style={{ background: filter === c ? 'rgba(99,102,241,0.15)' : 'rgba(15,15,35,0.4)', border: '1px solid ' + (filter === c ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.1)'), color: filter === c ? '#a5b4fc' : '#64748b' }}>{c}</button>
+        ))}
       </div>
-      <div className="flex items-center gap-3 mb-4">
-        <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search prompts..." className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-indigo-500" />
-        {CATEGORIES.map(c => (<button key={c} onClick={() => setCat(c)} className={'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ' + (cat === c ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-gray-900')}>{c}</button>))}
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+      <div className="grid grid-cols-2 gap-4">
         {filtered.map(p => (
-          <div key={p.id} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all">
+          <div key={p.title} className="rounded-xl p-5 transition-all hover:translate-y-[-1px]" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-semibold text-gray-900">{p.title}</div>
-              <span className="px-2 py-0.5 rounded text-[9px] font-semibold bg-gray-100 text-gray-500">{p.category}</span>
+              <div className="font-semibold text-sm">{p.title}</div>
+              <span className="px-2 py-0.5 rounded text-[9px] font-semibold" style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>{p.category}</span>
             </div>
-            <p className="text-xs text-gray-500 leading-relaxed mb-3 line-clamp-2">{p.prompt}</p>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 text-[10px] text-gray-400">
-                <span>{p.uses} uses</span>
-                <span>{'\u2605'} {p.rating}</span>
-              </div>
-              <button onClick={() => copy(p.id, p.prompt)} className="px-3 py-1 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-colors">
-                {copied === p.id ? 'Copied!' : 'Copy'}
-              </button>
+            <p className="text-xs text-indigo-300/50 mb-4 font-mono leading-relaxed line-clamp-3">{p.prompt}</p>
+            <div className="flex gap-2">
+              <button onClick={() => copyPrompt(p)} className="px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all" style={{ background: copied === p.title ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,241,0.1)', color: copied === p.title ? '#6ee7b7' : '#a5b4fc', border: '1px solid ' + (copied === p.title ? 'rgba(16,185,129,0.3)' : 'rgba(99,102,241,0.2)') }}>{copied === p.title ? 'Copied!' : 'Copy'}</button>
+              <a href="/playground" className="px-3 py-1.5 rounded-lg text-[10px] font-semibold" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', color: 'white' }}>Use in Playground</a>
             </div>
           </div>
         ))}

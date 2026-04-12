@@ -1,38 +1,58 @@
 'use client';
-import { useState } from 'react';
-export default function ToolsBuilderPage() {
-  const tools = [
-    { id: 'web_search', name: 'Web Search', type: 'built-in', desc: 'Search the web for real-time information', agents: 2, calls: 1240 },
-    { id: 'github_pr', name: 'GitHub PR Reader', type: 'built-in', desc: 'Read pull request details, diffs, and comments', agents: 1, calls: 89 },
-    { id: 'sql_query', name: 'SQL Query', type: 'built-in', desc: 'Execute read-only SQL queries on connected databases', agents: 1, calls: 67 },
-    { id: 'slack_send', name: 'Slack Notifier', type: 'integration', desc: 'Send messages to Slack channels and threads', agents: 2, calls: 340 },
-    { id: 'email_draft', name: 'Email Drafter', type: 'integration', desc: 'Draft and send emails via connected email accounts', agents: 1, calls: 98 },
-    { id: 'csv_parser', name: 'CSV Parser', type: 'built-in', desc: 'Parse and analyze CSV files with column mapping', agents: 1, calls: 45 },
-    { id: 'custom_api', name: 'Custom API Call', type: 'custom', desc: 'Make authenticated HTTP requests to any API endpoint', agents: 0, calls: 0 },
-  ];
-  const typeColor = (t) => t === 'built-in' ? 'bg-indigo-50 text-indigo-600' : t === 'integration' ? 'bg-purple-50 text-purple-600' : 'bg-amber-50 text-amber-600';
+import { useState, useEffect } from 'react';
+
+export default function ToolsPage() {
+  const [agents, setAgents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => { fetch('/api/agents').then(r => r.json()).then(d => { setAgents(Array.isArray(d) ? d : []); setLoading(false); }).catch(() => setLoading(false)); }, []);
+
+  // Build tool usage map from real agent data
+  const toolMap: Record<string, { count: number; agents: string[] }> = {};
+  agents.forEach(a => (a.tools || []).forEach((t: string) => {
+    if (!toolMap[t]) toolMap[t] = { count: 0, agents: [] };
+    toolMap[t].count++;
+    if (toolMap[t].agents.length < 5) toolMap[t].agents.push(a.name);
+  }));
+
+  const tools = Object.entries(toolMap).sort((a, b) => b[1].count - a[1].count);
+  const totalTools = tools.length;
+
+  const toolDescriptions: Record<string, string> = {
+    web_search: 'Search the web for real-time information',
+    document_reader: 'Read and extract content from documents',
+    summarizer: 'Summarize long text into key points',
+    code_analyzer: 'Analyze code for bugs, quality, and patterns',
+    github_pr: 'Create and review GitHub pull requests',
+    linter: 'Check code style and enforce best practices',
+    sql_query: 'Execute SQL queries against databases',
+    csv_parser: 'Parse and analyze CSV/spreadsheet data',
+    chart_generator: 'Create charts and data visualizations',
+    email_sender: 'Compose and send professional emails',
+    slack_notifier: 'Send notifications to Slack channels',
+    calendar: 'Manage calendar events and scheduling',
+  };
+
+  if (loading) return <div className="text-center py-16"><div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>;
+
   return (
-    <div className="max-w-[1000px] mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div><h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Tools & Functions</h1><p className="text-sm text-gray-500">Built-in tools, integrations, and custom functions available to agents</p></div>
-        <button className="px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 shadow-sm">+ Create Tool</button>
-      </div>
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"><div className="text-[11px] text-gray-400 uppercase tracking-wider">Total Tools</div><div className="text-xl font-bold text-gray-900 mt-1">{tools.length}</div></div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"><div className="text-[11px] text-gray-400 uppercase tracking-wider">Tool Calls (30d)</div><div className="text-xl font-bold text-indigo-600 mt-1">{tools.reduce((a, t) => a + t.calls, 0).toLocaleString()}</div></div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm"><div className="text-[11px] text-gray-400 uppercase tracking-wider">Custom</div><div className="text-xl font-bold text-amber-600 mt-1">{tools.filter(t => t.type === 'custom').length}</div></div>
-      </div>
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        {tools.map((t, i) => (
-          <div key={t.id} className={'px-5 py-4 flex items-center justify-between' + (i < tools.length - 1 ? ' border-b border-gray-100' : '') + ' hover:bg-gray-50 transition-colors'}>
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center text-gray-600 text-xs font-mono font-bold border border-gray-100">{t.name.substring(0, 2).toUpperCase()}</div>
-              <div><div className="text-sm font-medium text-gray-900">{t.name}</div><div className="text-[11px] text-gray-400">{t.desc}</div></div>
+    <div className="max-w-[1100px] mx-auto">
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Tools</h1>
+      <p className="text-sm text-indigo-300/50 mb-6">{totalTools} unique tools used across {agents.length} agents</p>
+
+      <div className="grid grid-cols-2 gap-4">
+        {tools.map(([name, data]) => (
+          <div key={name} className="rounded-xl p-5 transition-all hover:translate-y-[-1px]" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-mono font-semibold" style={{ color: '#a5b4fc' }}>{name}</span>
+              <span className="text-xs font-semibold" style={{ color: '#6ee7b7' }}>{data.count} agents</span>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] text-gray-400">{t.agents} agents</span>
-              <span className="text-[10px] text-gray-400">{t.calls.toLocaleString()} calls</span>
-              <span className={'px-2 py-0.5 rounded-full text-[9px] font-semibold ' + typeColor(t.type)}>{t.type}</span>
+            <p className="text-xs text-indigo-300/50 mb-3">{toolDescriptions[name] || 'Custom tool'}</p>
+            <div className="flex flex-wrap gap-1">
+              {data.agents.map(a => (
+                <span key={a} className="px-2 py-0.5 rounded text-[8px]" style={{ background: 'rgba(99,102,241,0.08)', color: '#818cf8' }}>{a}</span>
+              ))}
+              {data.count > 5 && <span className="text-[8px] text-indigo-400/40">+{data.count - 5} more</span>}
             </div>
           </div>
         ))}

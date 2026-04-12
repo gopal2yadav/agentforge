@@ -2,71 +2,71 @@
 import { useState } from 'react';
 
 const ENDPOINTS = [
-  { method: 'GET', path: '/api/agents', desc: 'List all agents', auth: true, response: '[{ "id": "1", "name": "Research Agent", "status": "ACTIVE" }]' },
-  { method: 'POST', path: '/api/agents', desc: 'Create a new agent', auth: true, body: '{ "name": "My Agent", "model": "claude-sonnet-4", "systemPrompt": "You are..." }', response: '{ "id": "4", "name": "My Agent", "status": "ACTIVE" }' },
-  { method: 'POST', path: '/api/agents/run', desc: 'Execute an agent with a prompt', auth: true, body: '{ "agentId": "1", "prompt": "Analyze market trends" }', response: '{ "result": "...", "tokensUsed": 3200, "latencyMs": 1850 }' },
-  { method: 'GET', path: '/api/flows', desc: 'List all flows', auth: true, response: '[{ "id": "1", "name": "Content Pipeline", "status": "active" }]' },
-  { method: 'POST', path: '/api/flows', desc: 'Create a new flow', auth: true, body: '{ "name": "My Flow", "nodes": [...], "edges": [...] }', response: '{ "id": "3", "name": "My Flow" }' },
-  { method: 'GET', path: '/api/swarm', desc: 'Swarm health check', auth: false, response: '{ "status": "operational", "agents": 7, "uptime": "99.97%" }' },
+  { method: 'GET', path: '/api/agents', desc: 'List all agents from database', response: 'Agent[]' },
+  { method: 'POST', path: '/api/agents', desc: 'Create a new agent', body: '{ name, role, goal, backstory, model, tools }', response: 'Agent' },
+  { method: 'DELETE', path: '/api/agents?id=xxx', desc: 'Delete an agent by ID', response: '{ deleted: true }' },
+  { method: 'POST', path: '/api/agents/run', desc: 'Execute an agent with real Claude AI', body: '{ agentId, prompt }', response: '{ reply, agent, model, usage }' },
+  { method: 'GET', path: '/api/flows', desc: 'List all flows', response: 'Flow[]' },
+  { method: 'POST', path: '/api/flows', desc: 'Create a new flow', body: '{ name, description, trigger, steps }', response: 'Flow' },
+  { method: 'GET', path: '/api/crews', desc: 'List all crews', response: 'Crew[]' },
+  { method: 'POST', path: '/api/crews', desc: 'Create a new crew', body: '{ name, config }', response: 'Crew' },
+  { method: 'GET', path: '/api/automations', desc: 'List all automations', response: 'Automation[]' },
+  { method: 'GET', path: '/api/stats', desc: 'Platform statistics', response: '{ agents, flows, crews, automations, totalRuns, tokensUsed }' },
+  { method: 'GET', path: '/api/health', desc: 'Service health check', response: '{ status, services, version, timestamp }' },
+  { method: 'POST', path: '/api/playground', desc: 'Multi-turn AI chat', body: '{ messages, model, agent }', response: '{ reply, model, usage }' },
+  { method: 'GET', path: '/api/swarm', desc: 'List swarm templates', response: 'SwarmTemplate[]' },
+  { method: 'POST', path: '/api/swarm', desc: 'Deploy a swarm', body: '{ swarmName }', response: '{ swarm, agents, crew }' },
+  { method: 'GET', path: '/api/notifications', desc: 'Real-time notifications', response: '{ notifications, unread, total }' },
+  { method: 'GET', path: '/api/billing/checkout', desc: 'Redirect to Stripe checkout', response: '307 Redirect' },
 ];
 
-export default function ApiDocsPage() {
-  const [expanded, setExpanded] = useState(null);
-  const methodColor = (m) => m === 'GET' ? 'bg-emerald-50 text-emerald-700' : m === 'POST' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700';
+export default function DocsPage() {
+  const [testing, setTesting] = useState<string | null>(null);
+  const [result, setResult] = useState('');
+
+  const testEndpoint = async (ep: typeof ENDPOINTS[0]) => {
+    setTesting(ep.path);
+    setResult('Loading...');
+    try {
+      const res = await fetch(ep.path);
+      const data = await res.json();
+      setResult(JSON.stringify(data, null, 2).substring(0, 1500));
+    } catch (e: any) { setResult('Error: ' + e.message); }
+    setTesting(null);
+  };
+
+  const methodColor = (m: string) => m === 'GET' ? 'bg-emerald-500/20 text-emerald-400' : m === 'POST' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-red-500/20 text-red-400';
 
   return (
-    <div className="max-w-[900px] mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">API Documentation</h1>
-        <p className="text-sm text-gray-500">RESTful API for programmatic access to Nexus agents and flows</p>
-      </div>
-      <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm mb-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">Base URL</h3>
-        <code className="text-sm font-mono bg-gray-50 px-3 py-1.5 rounded-lg text-indigo-600 border border-gray-100">https://agentforcecrew.com</code>
-        <div className="mt-3 text-xs text-gray-500">All API requests require an API key in the Authorization header:<br/>
-          <code className="font-mono text-gray-600">Authorization: Bearer nx_prod_YOUR_KEY</code>
-        </div>
-      </div>
-      <div className="space-y-3">
+    <div className="max-w-[1100px] mx-auto">
+      <h1 className="text-2xl font-bold tracking-tight mb-1">API Documentation</h1>
+      <p className="text-sm text-indigo-300/50 mb-2">Live API reference — all endpoints are real and connected to your database</p>
+      <p className="text-xs text-indigo-400/40 mb-6 font-mono">Base URL: https://agentforcecrew.com</p>
+
+      <div className="space-y-2">
         {ENDPOINTS.map((ep, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
-            <button onClick={() => setExpanded(expanded === i ? null : i)}
-              className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors">
+          <div key={i} className="rounded-xl overflow-hidden" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
+            <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className={"px-2 py-0.5 rounded text-[10px] font-bold font-mono " + methodColor(ep.method)}>{ep.method}</span>
-                <span className="text-sm font-mono text-gray-700">{ep.path}</span>
+                <span className={'px-2 py-0.5 rounded text-[9px] font-bold font-mono ' + methodColor(ep.method)}>{ep.method}</span>
+                <span className="text-sm font-mono text-indigo-200/80">{ep.path}</span>
+                <span className="text-xs text-indigo-300/40 hidden lg:inline">{ep.desc}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-400">{ep.desc}</span>
-                {ep.auth && <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-600">Auth</span>}
-                <span className="text-gray-300">{expanded === i ? '\u25B2' : '\u25BC'}</span>
-              </div>
-            </button>
-            {expanded === i && (
-              <div className="border-t border-gray-100 px-5 py-4 space-y-3">
-                {ep.body && (
-                  <div>
-                    <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Request Body</div>
-                    <pre className="bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs text-gray-700 font-mono overflow-x-auto">{ep.body}</pre>
-                  </div>
-                )}
-                <div>
-                  <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Response</div>
-                  <pre className="bg-gray-50 border border-gray-100 rounded-lg p-3 text-xs text-gray-700 font-mono overflow-x-auto">{ep.response}</pre>
-                </div>
-              </div>
-            )}
+              {ep.method === 'GET' && (
+                <button onClick={() => testEndpoint(ep)} disabled={testing === ep.path} className="px-3 py-1 rounded-lg text-[10px] font-semibold" style={{ background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.2)' }}>{testing === ep.path ? '...' : 'Try it'}</button>
+              )}
+            </div>
+            {ep.body && <div className="px-4 pb-3 text-[10px] font-mono text-indigo-300/40">Body: {ep.body}</div>}
           </div>
         ))}
       </div>
-      <div className="mt-8 bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">Rate Limits</h3>
-        <div className="grid grid-cols-3 gap-4 text-sm">
-          <div><span className="text-gray-400 text-xs">Free</span><div className="font-medium text-gray-900">100 req/day</div></div>
-          <div><span className="text-gray-400 text-xs">Pro</span><div className="font-medium text-indigo-600">5,000 req/day</div></div>
-          <div><span className="text-gray-400 text-xs">Enterprise</span><div className="font-medium text-gray-900">Unlimited</div></div>
+
+      {result && (
+        <div className="mt-6 rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(99,102,241,0.1)' }}>
+          <div className="text-[10px] font-semibold text-indigo-400/50 uppercase tracking-wider mb-2">Response</div>
+          <pre className="text-xs font-mono text-emerald-400/80 whitespace-pre-wrap overflow-auto max-h-64">{result}</pre>
         </div>
-      </div>
+      )}
     </div>
   );
 }
