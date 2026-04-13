@@ -44,14 +44,14 @@ export default function HomePage() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    canvas.width = window.innerWidth; canvas.height = 6000;
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     const stars: { x: number; y: number; r: number; s: number; c: string }[] = [];
     const cols = ['#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#c4b5fd'];
     for (let i = 0; i < 400; i++) stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.8+0.3, s: Math.random()*0.4+0.1, c: cols[Math.floor(Math.random()*cols.length)] });
     let id: number;
     const draw = () => {
       ctx.fillStyle = 'rgba(2,1,8,0.08)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-      stars.forEach(st => { const t = 0.5+0.5*Math.sin(Date.now()*0.001*st.s+st.x); ctx.beginPath(); ctx.arc(st.x,st.y,st.r*t,0,Math.PI*2); ctx.fillStyle=st.c; ctx.globalAlpha=t*0.7; ctx.fill(); ctx.globalAlpha=1; st.y-=st.s*0.2; if(st.y<-5){st.y=canvas.height+5;st.x=Math.random()*canvas.width;} });
+      stars.forEach(st => { const t = 0.5+0.5*Math.sin(Date.now()*0.001*st.s+st.x); ctx.beginPath(); ctx.arc(st.x,st.y,st.r*t,0,Math.PI*2); ctx.fillStyle=st.c; ctx.globalAlpha=t*0.7; ctx.fill(); ctx.globalAlpha=1; st.y-=st.s*0.2; if(st.y<-5){st.y=window.innerHeight+5;st.x=Math.random()*canvas.width;} });
       id = requestAnimationFrame(draw);
     };
     ctx.fillStyle='#020108'; ctx.fillRect(0,0,canvas.width,canvas.height); draw();
@@ -71,7 +71,7 @@ export default function HomePage() {
         <div className="text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8" style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)' }}><div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /><span className="text-xs text-indigo-300">v2.9 | 32 Agents | 21 APIs | 38 Pages | Universe Mode</span></div>
           <h1 className="text-7xl font-bold leading-tight mb-6"><span className="text-white" style={{ textShadow: '0 0 40px rgba(255,255,255,0.1)' }}>Orchestrate AI Agents</span><br /><span style={{ background: 'linear-gradient(135deg, #818cf8, #c084fc, #f0abfc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>That Think Together</span></h1>
-          <p className="text-lg text-indigo-200/60 max-w-2xl mx-auto mb-10 leading-relaxed">Build, deploy, and manage autonomous AI agent swarms. Visual workflow builder, code sandbox, marketplace, public API, and enterprise governance — all powered by Claude Sonnet 4.</p>
+          <p className="text-lg text-indigo-200/60 max-w-2xl mx-auto mb-10 leading-relaxed">Build, deploy, and manage autonomous AI agent swarms. Visual workflow builder, code sandbox, marketplace, public API, and enterprise governance â all powered by Claude Sonnet 4.</p>
           <div className="flex items-center gap-4 justify-center mb-12"><Link href="/sign-up" className="px-8 py-4 rounded-xl text-base font-semibold text-white hover:scale-105 transition-all" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 0 40px rgba(99,102,241,0.4)' }}>Start Building Free</Link><Link href="/docs" className="px-8 py-4 rounded-xl text-base font-semibold text-indigo-200/80 hover:text-white transition-all" style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)' }}>View API Docs</Link></div>
           <div className="grid grid-cols-5 gap-4 max-w-2xl mx-auto">{[{v:'38+',l:'Pages'},{v:'21+',l:'APIs'},{v:'19',l:'Templates'},{v:'6',l:'Industries'},{v:'<2s',l:'Latency'}].map(s => (<div key={s.l} className="text-center"><div className="text-xl font-bold" style={{ background: 'linear-gradient(135deg, #818cf8, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{s.v}</div><div className="text-[10px] text-indigo-300/40 mt-1">{s.l}</div></div>))}</div>
         </div>
