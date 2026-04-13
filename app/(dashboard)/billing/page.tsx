@@ -1,54 +1,92 @@
 'use client';
-import { useState } from 'react';
-
-const PLANS = [
-  { name: 'Free', price: '$0', period: '/month', features: ['3 Agents', '100K tokens/mo', '1 Flow', 'Community support'], current: false, cta: 'Current Plan' },
-  { name: 'Pro', price: '$49', period: '/month', features: ['25 Agents', '10M tokens/mo', '20 Flows', 'Priority support', 'Visual flow builder', 'API access', 'Webhooks', 'Knowledge base'], current: true, cta: 'Upgrade to Pro', highlight: true },
-  { name: 'Enterprise', price: 'Custom', period: '', features: ['Unlimited agents', 'Unlimited tokens', 'Unlimited flows', 'Dedicated support', 'SSO / SAML', 'On-premise deployment', 'Custom SLA', 'Audit logs'], current: false, cta: 'Contact Sales' },
-];
+import { useState, useEffect } from 'react';
 
 export default function BillingPage() {
-  const [upgrading, setUpgrading] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleUpgrade = async () => {
-    setUpgrading(true);
-    try {
-      const res = await fetch('/api/billing/checkout', { method: 'POST' });
-      const data = await res.json();
-      if (data.url) window.location.href = data.url;
-    } catch (e) { setUpgrading(false); }
-  };
+  useEffect(() => { fetch('/api/stats').then(r => r.json()).then(s => { setStats(s); setLoading(false); }).catch(() => setLoading(false)); }, []);
+
+  if (loading) return <div className="text-center py-16"><div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto" /></div>;
+
+  const cost = ((stats?.tokensUsed || 0) / 1000000 * 3).toFixed(4);
 
   return (
-    <div className="max-w-[1100px] mx-auto">
-      <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-1">Billing</h1>
-      <p className="text-sm text-gray-500 mb-8">Manage your subscription and payment details</p>
+    <div className="max-w-[900px] mx-auto">
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Billing</h1>
+      <p className="text-sm text-indigo-300/50 mb-8">Manage your subscription and usage</p>
 
-      <div className="grid grid-cols-3 gap-6">
-        {PLANS.map(plan => (
-          <div key={plan.name} className={'bg-white border rounded-xl p-6 ' + (plan.highlight ? 'border-indigo-300 shadow-lg ring-1 ring-indigo-100' : 'border-gray-200')}>
-            {plan.highlight && <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider mb-2">Most Popular</div>}
-            <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
-            <div className="mt-2 mb-4">
-              <span className="text-3xl font-bold text-gray-900">{plan.price}</span>
-              <span className="text-sm text-gray-400">{plan.period}</span>
+      <div className="space-y-6">
+        <div className="rounded-xl p-6" style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)' }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-xs text-indigo-400/50 uppercase tracking-wider">Current Plan</div>
+              <div className="text-3xl font-bold mt-1" style={{ color: '#a5b4fc' }}>{stats?.plan || 'Free'}</div>
+              <div className="text-sm text-indigo-300/50 mt-1">All features included</div>
             </div>
-            <ul className="space-y-2 mb-6">
-              {plan.features.map(f => (
-                <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className="text-emerald-500 text-xs">OK</span> {f}
-                </li>
-              ))}
-            </ul>
-            {plan.highlight ? (
-              <button onClick={handleUpgrade} disabled={upgrading} className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 shadow-sm">{upgrading ? 'Redirecting to Stripe...' : plan.cta}</button>
-            ) : plan.name === 'Enterprise' ? (
-              <a href="mailto:gopal@aabhyasa.com" className="block w-full text-center px-4 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:border-indigo-200">{plan.cta}</a>
-            ) : (
-              <div className="w-full text-center px-4 py-2.5 rounded-lg bg-gray-50 text-sm font-medium text-gray-400">{plan.cta}</div>
-            )}
+            <a href="/api/billing/checkout" className="px-6 py-3 rounded-xl text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 0 30px rgba(99,102,241,0.3)' }}>Upgrade Plan</a>
           </div>
-        ))}
+        </div>
+
+        <div className="rounded-xl p-6" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
+          <div className="text-sm font-semibold mb-4">Usage This Period</div>
+          <div className="grid grid-cols-3 gap-6">
+            <div>
+              <div className="text-xs text-indigo-300/40">Tokens Used</div>
+              <div className="text-2xl font-bold mt-1">{(stats?.tokensUsed || 0).toLocaleString()}</div>
+            </div>
+            <div>
+              <div className="text-xs text-indigo-300/40">Total Runs</div>
+              <div className="text-2xl font-bold mt-1" style={{ color: '#6ee7b7' }}>{stats?.totalRuns || 0}</div>
+            </div>
+            <div>
+              <div className="text-xs text-indigo-300/40">Est. AI Cost</div>
+              <div className="text-2xl font-bold mt-1" style={{ color: '#fcd34d' }}>{'$' + cost}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl p-6" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
+          <div className="text-sm font-semibold mb-4">Resources</div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-indigo-300/60">Agents</span>
+              <div className="flex items-center gap-3">
+                <div className="w-48 h-2 rounded-full" style={{ background: 'rgba(99,102,241,0.1)' }}>
+                  <div className="h-full rounded-full" style={{ width: Math.min(100, ((stats?.agents || 0) / 25) * 100) + '%', background: 'linear-gradient(90deg, #4f46e5, #7c3aed)' }} />
+                </div>
+                <span className="text-xs font-mono text-indigo-300/50">{stats?.agents || 0}/25</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-indigo-300/60">Flows</span>
+              <div className="flex items-center gap-3">
+                <div className="w-48 h-2 rounded-full" style={{ background: 'rgba(99,102,241,0.1)' }}>
+                  <div className="h-full rounded-full" style={{ width: Math.min(100, ((stats?.flows || 0) / 20) * 100) + '%', background: 'linear-gradient(90deg, #10b981, #6ee7b7)' }} />
+                </div>
+                <span className="text-xs font-mono text-indigo-300/50">{stats?.flows || 0}/20</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-indigo-300/60">Tokens</span>
+              <div className="flex items-center gap-3">
+                <div className="w-48 h-2 rounded-full" style={{ background: 'rgba(99,102,241,0.1)' }}>
+                  <div className="h-full rounded-full" style={{ width: Math.min(100, ((stats?.tokensUsed || 0) / 10000000) * 100) + '%', background: 'linear-gradient(90deg, #f59e0b, #fcd34d)' }} />
+                </div>
+                <span className="text-xs font-mono text-indigo-300/50">{((stats?.tokensUsed || 0) / 1000).toFixed(1)}K/10M</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl p-6" style={{ background: 'rgba(15,15,35,0.6)', border: '1px solid rgba(99,102,241,0.15)' }}>
+          <div className="text-sm font-semibold mb-3">Payment</div>
+          <p className="text-xs text-indigo-300/50 mb-4">Payments are processed via Stripe. Click below to manage your subscription.</p>
+          <div className="flex gap-3">
+            <a href="/api/billing/checkout" className="px-4 py-2 rounded-lg text-xs font-semibold text-white" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)' }}>Subscribe to Pro ($49/mo)</a>
+            <a href="https://dashboard.stripe.com" target="_blank" rel="noopener" className="px-4 py-2 rounded-lg text-xs font-semibold" style={{ color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.2)' }}>Stripe Dashboard</a>
+          </div>
+        </div>
       </div>
     </div>
   );
