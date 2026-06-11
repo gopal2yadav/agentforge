@@ -25,3 +25,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Missing crew id' }, { status: 400 });
+    await prisma.crew.delete({ where: { id } });
+    return NextResponse.json({ deleted: true });
+  } catch (e: any) {
+    return NextResponse.json({ error: 'Failed to delete: ' + e.message }, { status: 500 });
+  }
+}
