@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_POSTGRES_PRISMA_URL")
+  url      = env("AGENTFORGE_PRISMA_URL")
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
