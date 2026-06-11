@@ -74,3 +74,4 @@ Proprietary. Built by [Aabhyasa AI](mailto:gopal@aabhyasa.com).
 ---
 
 *50+ pages, 9 API endpoints, clean white theme, zero deployment failures.*
+Last schema update: June 2026 (dedicated agentforge Postgres schema)
