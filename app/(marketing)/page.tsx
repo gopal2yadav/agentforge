@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
 
 const FEATURES = [
   { title: 'Visual Flow Builder', desc: 'Drag-and-drop canvas to build agent workflows. 5 node types, save to database.', href: '/flow-builder', icon: 'F' },
@@ -47,7 +48,7 @@ export default function HomePage() {
     <div className="relative min-h-screen " style={{ background: '#020108' }}>
       <nav className="relative z-10 flex items-center justify-between px-8 py-5">
         <div className="flex items-center gap-2.5"><div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 0 20px rgba(99,102,241,0.4)' }}>N</div><span className="text-xl font-bold text-white" style={{ textShadow: '0 0 20px rgba(99,102,241,0.5)' }}>Nexus</span></div>
-        <div className="flex items-center gap-6"><a href="#features" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Features</a><a href="#marketplace" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Marketplace</a><Link href="/demo" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Live Demo</Link><Link href="/pricing" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Pricing</Link><Link href="/sign-in" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Sign In</Link><Link href="/sign-up" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}>Get Started Free</Link></div>
+        <div className="flex items-center gap-6"><a href="#features" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Features</a><a href="#marketplace" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Marketplace</a><Link href="/demo" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Live Demo</Link><Link href="/pricing" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Pricing</Link><SignedOut><Link href="/sign-in" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Sign In</Link></SignedOut><SignedIn><Link href="/dashboard" className="text-sm text-indigo-300/60 hover:text-white transition-colors">Open Dashboard →</Link></SignedIn><Link href="/sign-up" className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}>Get Started Free</Link></div>
       </nav>
       <section className="relative z-10 flex flex-col items-center px-6 pt-16 pb-24">
         <div className="text-center max-w-4xl mx-auto">
