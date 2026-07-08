@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: model === 'claude-opus-4' ? 'claude-opus-4-20250514' : 'claude-sonnet-4-20250514',
+        model: model === 'claude-opus-4' ? 'claude-sonnet-4-6' : 'claude-sonnet-4-6',
         max_tokens: 2048,
         system: systemPrompt,
         messages: apiMessages,
